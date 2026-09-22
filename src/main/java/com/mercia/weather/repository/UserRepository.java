@@ -8,4 +8,5 @@ import com.mercia.weather.entities.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>{
 
+	boolean findByEmail(String email);
 }
