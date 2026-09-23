@@ -10,7 +10,6 @@ public class WeatherService {
 	@Value("${api.key}")
 	private String apiKey;
 	
-	
 	private final RestClient restClient;
 	
 	public WeatherService(RestClient restClient)
@@ -23,7 +22,7 @@ public class WeatherService {
 		return restClient.get()
 				.uri(uriBuilder -> uriBuilder
                 .path("/data/2.5/weather")
-                .queryParam("q", "Bengaluru")
+                .queryParam("q", "Bangalore")
                 .queryParam("units", "metric")
                 .queryParam("appid", apiKey)
                 .build())

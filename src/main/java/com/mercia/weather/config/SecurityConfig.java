@@ -29,7 +29,9 @@ public class SecurityConfig {
             
                 .requestMatchers("/auth/register","/auth/login").permitAll()
                 .requestMatchers("/city/**").hasRole("ADMIN")
-                .requestMatchers("/weather/**").hasAllRoles("ADMIN","USER")
+                .requestMatchers("/weather/**").permitAll()
+                .requestMatchers("/","/index.html").permitAll()
+                .requestMatchers("/css/**").permitAll()
                 .anyRequest().authenticated()
                 
                 
