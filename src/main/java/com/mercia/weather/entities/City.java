@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="entity")
+@Table(name="city")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -30,4 +30,11 @@ public class City {
 	private String country;
 	
 	private LocalDateTime createdAt;
+	
+	public City(String cityName,String country, LocalDateTime createdAt)
+	{
+		this.cityName = cityName;
+		this.country = country;
+		this.createdAt = createdAt;
+	}
 }
