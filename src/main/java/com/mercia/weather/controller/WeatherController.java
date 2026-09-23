@@ -1,10 +1,13 @@
 package com.mercia.weather.controller;
 
-import org.jspecify.annotations.Nullable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mercia.weather.dto.WeatherRequestDto;
+import com.mercia.weather.dto.WeatherResponseDto;
 import com.mercia.weather.service.WeatherService;
 
 @RestController
@@ -19,8 +22,10 @@ public class WeatherController {
 	}
 	
 	@GetMapping("/getInfo")
-	public @Nullable String getInfo()
+	public ResponseEntity<WeatherResponseDto> getInfo(@RequestBody WeatherRequestDto weatherRequestDto)
 	{
-		return weatherService.info();
+		
+	   WeatherResponseDto response = weatherService.info(weatherRequestDto);
+	   return ResponseEntity.ok().body(response);
 	}
 }

@@ -29,12 +29,15 @@ public class City {
 	
 	private String country;
 	
+	private  String state;
+	
 	private LocalDateTime createdAt;
 	
-	public City(String cityName,String country, LocalDateTime createdAt)
+	public City(String cityName,String country, String state,LocalDateTime createdAt)
 	{
 		this.cityName = cityName;
 		this.country = country;
 		this.createdAt = createdAt;
+		this.state = state;
 	}
 }

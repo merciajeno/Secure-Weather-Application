@@ -13,7 +13,11 @@ import org.springframework.web.client.RestClient;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.mercia.weather.dto.WeatherRequestDto;
+import com.mercia.weather.dto.WeatherResponseDto;
 import com.mercia.weather.filter.JwtFilter;
+
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 public class SecurityConfig {
@@ -55,11 +59,17 @@ public class SecurityConfig {
 	}
 	
 	@Bean
-	Cache<String, String> cache()
+	Cache<WeatherRequestDto, WeatherResponseDto> cache()
 	{
 		return Caffeine.newBuilder()
 	            .maximumSize(200)
 	            .expireAfterWrite(10, TimeUnit.MINUTES)
 	            .build();
+	}
+	
+	@Bean
+	ObjectMapper objectMapper()
+	{
+		return new ObjectMapper();
 	}
 }
