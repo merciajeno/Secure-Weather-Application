@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -38,7 +39,8 @@ public class User {
 		this.role = role;
 		this.createdAt = createdAt;
 	}
-	@NotBlank
+	@NotBlank @NotNull
+	@Column(unique = true)
 	private String username;
 	
 	@Column(unique=true)

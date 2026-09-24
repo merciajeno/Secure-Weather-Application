@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+</head>
+<body>
+    <form action="http://localhost:8080/auth/register" method="POST">
+        
+        <div>
+            <label for="userName">Full Name:</label>
+            <input type="text" id="userName" name="username" placeholder="John Doe" required>
+        </div>
+        
+        <br>
+
+        <div>
+            <label for="userEmail">Email Address:</label>
+            <input type="email" id="userEmail" name="email" placeholder="john@example.com" required>
+        </div>
+        
+        <br>
+
+         <div>
+            <label for="userPassword">Password:</label>
+            <input type="password" id="userPassword" name="password" required>
+        </div>
+
+        <br>
+        <div>
+            <button type="submit">Submit Form</button>
+        </div>
+
+        <br>
+        
+        
+
+    </form>
+</body>
+<script>
+    
+    const form = document.getElementById("form")
+    form.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const formData = new FormData(form);
+  const jsonPayload = Object.fromEntries(formData.entries());
+console.log(jsonPayload)
+try {
+    const response = await fetch('http://localhost:8080/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(jsonPayload)
+    });
+    if (response.ok) alert('Success!');
+  } catch (error) {
+    console.error('Error:', error);
+  }
+    })
+
+</script>
+</html>

@@ -33,9 +33,9 @@ public class SecurityConfig {
             
                 .requestMatchers("/auth/register","/auth/login").permitAll()
                 .requestMatchers("/city/**").hasRole("ADMIN")
-                .requestMatchers("/weather/**").permitAll()
-                .requestMatchers("/","/index.html").permitAll()
-                .requestMatchers("/css/**").permitAll()
+                .requestMatchers("/weather/**").hasAnyRole("ADMIN","USER")
+                .requestMatchers("/","/index.html","/login.html","/register.html").permitAll()
+                .requestMatchers("/css/**","/favicon.ico").permitAll()
                 .anyRequest().authenticated()
                 
                 

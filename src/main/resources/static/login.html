@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+</head>
+<body>
+   <form id="form" action="http://localhost:8080/auth/login" method="POST">
+        
+        <div>
+            <label for="userName">Full Name:</label>
+            <input type="text" id="userName" name="username" required>
+        </div>
+        
+        <br>
+
+
+        <div>
+            <label for="userPassword">Password:</label>
+            <input type="password" id="userPassword" name="password" required>
+        </div>
+        
+        <br>
+
+  
+        <div>
+            <button type="submit">Submit Form</button>
+        </div>
+
+    </form>
+</body>
+<script>
+
+    const form = document.getElementById("form")
+    form.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const formData = new FormData(form);
+  const jsonPayload = Object.fromEntries(formData.entries());
+  console.log("Hi")
+console.log(jsonPayload)
+try {
+    const response = await fetch('http://localhost:8080/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(jsonPayload)
+    });
+    console.log(response);
+    const data = await response.text();
+    localStorage.setItem('token', data);
+    console.log("data", data);
+    
+    
+  } catch (error) {
+    console.error('Error:', error);
+  }
+    })
+</script>
+</html>

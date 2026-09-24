@@ -27,6 +27,7 @@ public class CacheService {
 	
 	public WeatherResponseDto getIfPresent(WeatherRequestDto key)
 	{
+		log.info("returned from the cache");
 		return cache.getIfPresent(key);
 	}
 }
