@@ -14,27 +14,27 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="city")
+@Table(name = "city")
 @Getter
 @Setter
 @NoArgsConstructor
 public class City {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@NotBlank @NotNull
+
+	@NotBlank
+	@NotNull
 	private String cityName;
-	
+
 	private String country;
-	
-	private  String state;
-	
+
+	private String state;
+
 	private LocalDateTime createdAt;
-	
-	public City(String cityName,String country, String state)
-	{
+
+	public City(String cityName, String country, String state) {
 		this.cityName = cityName;
 		this.country = country;
 		this.createdAt = LocalDateTime.now();

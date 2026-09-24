@@ -12,21 +12,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CacheService {
 
-	private final Cache<WeatherRequestDto,WeatherResponseDto> cache;
-	
-	public CacheService(Cache<WeatherRequestDto,WeatherResponseDto> cache)
-	{
+	private final Cache<WeatherRequestDto, WeatherResponseDto> cache;
+
+	public CacheService(Cache<WeatherRequestDto, WeatherResponseDto> cache) {
 		this.cache = cache;
 	}
-	
-	public void addToCache(WeatherRequestDto weatherRequestDto,WeatherResponseDto weatherResponseDto)
-	{
+
+	public void addToCache(WeatherRequestDto weatherRequestDto, WeatherResponseDto weatherResponseDto) {
 		cache.put(weatherRequestDto, weatherResponseDto);
 		log.info("cached");
 	}
-	
-	public WeatherResponseDto getIfPresent(WeatherRequestDto key)
-	{
+
+	public WeatherResponseDto getIfPresent(WeatherRequestDto key) {
 		log.info("returned from the cache");
 		return cache.getIfPresent(key);
 	}

@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,30 +27,32 @@ public class User {
 		return "User [id=" + id + ", username=" + username + ", email=" + email + ", password=" + password + ", role="
 				+ role + ", createdAt=" + createdAt + "]";
 	}
+
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	public User(String username,String email,String password,Role role,LocalDateTime createdAt)
-	{
-		this.username=username;
+
+	public User(String username, String email, String password, Role role, LocalDateTime createdAt) {
+		this.username = username;
 		this.email = email;
 		this.password = password;
 		this.role = role;
 		this.createdAt = createdAt;
 	}
-	@NotBlank @NotNull
+
+	@NotBlank
+	@NotNull
 	@Column(unique = true)
 	private String username;
-	
-	@Column(unique=true)
+
+	@Column(unique = true)
 	@Email
-	private  String email;
-	
+	private String email;
+
 	private String password;
-	
+
 	private Role role;
-	
+
 	private LocalDateTime createdAt;
 
 }

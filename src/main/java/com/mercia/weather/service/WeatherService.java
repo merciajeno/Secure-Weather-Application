@@ -31,18 +31,19 @@ public class WeatherService {
 	private String apiKey;
 
 	private final RestClient restClient;
-	
+
 	private final CacheService cacheService;
-	
+
 	private final ObjectMapper objectMapper;
-	
+
 	private final AccessAuditRepository accessAuditRepo;
-	
+
 	private final UserRepository userRepo;
-	
+
 	private final CityRepository cityRepo;
 
-	public WeatherService(RestClient restClient, CacheService cacheService, ObjectMapper objectMapper, AccessAuditRepository accessAuditRepo, UserRepository userRepo, CityRepository cityRepo) {
+	public WeatherService(RestClient restClient, CacheService cacheService, ObjectMapper objectMapper,
+			AccessAuditRepository accessAuditRepo, UserRepository userRepo, CityRepository cityRepo) {
 		this.restClient = restClient;
 		this.cacheService = cacheService;
 		this.objectMapper = objectMapper;
@@ -55,28 +56,27 @@ public class WeatherService {
 		String city = weatherRequestDto.getCity();
 		String state = weatherRequestDto.getState();
 		String country = weatherRequestDto.getCountry();
-		
+
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String name = authentication.getName();
 		User user = userRepo.findByUsername(name).get();
-		AccessAudit entity = new AccessAudit(user.getId(),name,user.getEmail(),"/weather/getInfo",null,LocalDateTime.now());
+		AccessAudit entity = new AccessAudit(user.getId(), name, user.getEmail(), "/weather/getInfo", null,
+				LocalDateTime.now());
 		Optional<City> byNameStateCountry = cityRepo.findByNameStateCountry(city, state, country);
-		if(byNameStateCountry.isEmpty())
-		{
+		if (byNameStateCountry.isEmpty()) {
 			entity.setActionDetails("user tried to fetch unavailable city");
 			entity.setStatus(Status.FAILED);
 			accessAuditRepo.save(entity);
 		}
-		byNameStateCountry.orElseThrow(()->new UnavailableCity("City you have requested is unavailable"));
-		
+		byNameStateCountry.orElseThrow(() -> new UnavailableCity("City you have requested is unavailable"));
+
 		WeatherResponseDto ifPresent = cacheService.getIfPresent(weatherRequestDto);
-		
-		entity.setActionDetails(String.format("User fetched details for %s,%s,%s", city,state,country));
+
+		entity.setActionDetails(String.format("User fetched details for %s,%s,%s", city, state, country));
 		entity.setStatus(Status.SUCCESS);
 		accessAuditRepo.save(entity);
-		if (ifPresent!=null)
-		{
-		
+		if (ifPresent != null) {
+
 			return ifPresent;
 		}
 		String query = String.format("%s, %s, %s", city, state, country);
@@ -85,7 +85,7 @@ public class WeatherService {
 				// Combine city, state, and country code with commas
 				.queryParam("q", query).queryParam("units", "metric").queryParam("appid", apiKey).build()).retrieve()
 				.body(String.class);
-		
+
 		JsonNode json = objectMapper.readTree(body);
 		WeatherResponseDto weatherResponseDto = new WeatherResponseDto();
 		weatherResponseDto.setPressure(json.get("main").get("pressure").asFloat());

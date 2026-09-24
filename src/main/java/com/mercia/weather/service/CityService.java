@@ -23,9 +23,8 @@ import tools.jackson.databind.ObjectMapper;
 public class CityService {
 	private final CityRepository cityRepo;
 
-	
 	private final ChangeAuditRepository changeAuditRepo;
-	
+
 	private final ObjectMapper objectMapper;
 
 	CityService(CityRepository cityRepo, ChangeAuditRepository changeAuditRepo, ObjectMapper objectMapper) {
@@ -36,7 +35,7 @@ public class CityService {
 	}
 
 	public ResponseEntity<String> addCity(City city) {
-		
+
 		Optional<City> byNameStateCountry = cityRepo.findByNameStateCountry(city.getCityName(), city.getState(),
 				city.getCountry());
 		if (byNameStateCountry.isPresent())

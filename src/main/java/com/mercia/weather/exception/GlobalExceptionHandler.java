@@ -17,16 +17,14 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<String> handleExistingResource(ResourceAlreadyExists ex) {
 		return ResponseEntity.badRequest().body(ex.getMessage());
 	}
-	
+
 	@ExceptionHandler(UserNotFoundException.class)
-	public ResponseEntity<String> userNotFound(UserNotFoundException ex)
-	{
+	public ResponseEntity<String> userNotFound(UserNotFoundException ex) {
 		return ResponseEntity.badRequest().body(ex.getMessage());
 	}
-	
+
 	@ExceptionHandler(UnavailableCity.class)
-	public ResponseEntity<String> cityNotIncluded(UnavailableCity ex)
-	{
+	public ResponseEntity<String> cityNotIncluded(UnavailableCity ex) {
 		return ResponseEntity.badRequest().body(ex.getMessage());
 	}
 }

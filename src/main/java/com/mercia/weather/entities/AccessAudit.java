@@ -14,33 +14,33 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="access_audit")
+@Table(name = "access_audit")
 @Getter
 @Setter
 @NoArgsConstructor
 public class AccessAudit {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	private Long userId;
-	
+
 	private String userName;
-	
+
 	private String userEmail;
-	
+
 	private String endpoint;
-	
+
 	@Enumerated(EnumType.STRING)
 	private Status status;
-	
+
 	private LocalDateTime timeStamp;
-	
+
 	private String actionDetails;
-	
-	public AccessAudit(Long userId,String userName,String userEmail,String endpoint,Status status,LocalDateTime timeStamp)
-	{
+
+	public AccessAudit(Long userId, String userName, String userEmail, String endpoint, Status status,
+			LocalDateTime timeStamp) {
 		this.userId = userId;
 		this.userName = userName;
 		this.userEmail = userEmail;
@@ -48,6 +48,5 @@ public class AccessAudit {
 		this.status = status;
 		this.timeStamp = timeStamp;
 	}
-	
-	
+
 }

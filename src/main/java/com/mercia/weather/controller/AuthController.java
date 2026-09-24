@@ -16,10 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/auth")
 @Slf4j
 public class AuthController {
-	
+
 	private final AuthService authService;
-	public AuthController(AuthService authService)
-	{
+
+	public AuthController(AuthService authService) {
 		this.authService = authService;
 	}
 
@@ -36,6 +36,5 @@ public class AuthController {
 		log.info("login request");
 		return authService.login(request);
 	}
-	
 
 }

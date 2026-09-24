@@ -31,10 +31,10 @@ public class ChangeAudit {
 	private ResourceType resourceType;
 
 	private LocalDateTime updatedAt;
-	
+
 	@JdbcTypeCode(SqlTypes.JSON)
 	private String oldValue;
-	
+
 	@JdbcTypeCode(SqlTypes.JSON)
 	private String newValue;
 
