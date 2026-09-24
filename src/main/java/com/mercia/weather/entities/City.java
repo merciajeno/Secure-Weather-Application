@@ -33,11 +33,11 @@ public class City {
 	
 	private LocalDateTime createdAt;
 	
-	public City(String cityName,String country, String state,LocalDateTime createdAt)
+	public City(String cityName,String country, String state)
 	{
 		this.cityName = cityName;
 		this.country = country;
-		this.createdAt = createdAt;
+		this.createdAt = LocalDateTime.now();
 		this.state = state;
 	}
 }

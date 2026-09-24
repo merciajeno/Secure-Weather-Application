@@ -37,6 +37,8 @@ public class AccessAudit {
 	
 	private LocalDateTime timeStamp;
 	
+	private String actionDetails;
+	
 	public AccessAudit(Long userId,String userName,String userEmail,String endpoint,Status status,LocalDateTime timeStamp)
 	{
 		this.userId = userId;

@@ -23,4 +23,10 @@ public class GlobalExceptionHandler {
 	{
 		return ResponseEntity.badRequest().body(ex.getMessage());
 	}
+	
+	@ExceptionHandler(UnavailableCity.class)
+	public ResponseEntity<String> cityNotIncluded(UnavailableCity ex)
+	{
+		return ResponseEntity.badRequest().body(ex.getMessage());
+	}
 }

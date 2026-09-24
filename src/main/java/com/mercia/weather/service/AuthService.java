@@ -49,7 +49,9 @@ public class AuthService {
 		System.out.println(user);
 		userRepo.save(user);
 		Long id  = userRepo.findByEmail(user.getEmail()).get().getId();
-		accessAuditRepo.save(new AccessAudit(id, request.getUsername(), request.getEmail(),"/auth/register", Status.SUCCESS, LocalDateTime.now()));
+		AccessAudit entity = new AccessAudit(id, request.getUsername(), request.getEmail(),"/auth/register", Status.SUCCESS, LocalDateTime.now());
+		entity.setActionDetails("Registered ");
+		accessAuditRepo.save(entity);
 		return ResponseEntity.ok().body("User Registered successfully");
 	}
 	
