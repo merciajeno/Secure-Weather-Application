@@ -18,22 +18,19 @@ public class AuditController {
 
 	private final ChangeAuditRepository changeAuditRepo;
 	private final AccessAuditRepository accessAuditRepo;
-	
-	public AuditController(ChangeAuditRepository changeAuditRepo, AccessAuditRepository accessAuditRepo)
-	{
+
+	public AuditController(ChangeAuditRepository changeAuditRepo, AccessAuditRepository accessAuditRepo) {
 		this.accessAuditRepo = accessAuditRepo;
 		this.changeAuditRepo = changeAuditRepo;
 	}
-	
+
 	@GetMapping("/access")
-	public ResponseEntity<List<AccessAudit>> getAccessAudits()
-	{
+	public ResponseEntity<List<AccessAudit>> getAccessAudits() {
 		return ResponseEntity.ok(accessAuditRepo.findAll());
 	}
-	
+
 	@GetMapping("/changing")
-	public ResponseEntity<List<ChangeAudit>> getChangeAudits()
-	{
+	public ResponseEntity<List<ChangeAudit>> getChangeAudits() {
 		return ResponseEntity.ok(changeAuditRepo.findAll());
 	}
 }
