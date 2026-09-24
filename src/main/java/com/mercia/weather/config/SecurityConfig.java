@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .requestMatchers("/auth/register","/auth/login").permitAll()
                 .requestMatchers("/city/**").hasRole("ADMIN")
                 .requestMatchers("/weather/**").hasAnyRole("ADMIN","USER")
+                .requestMatchers("/audit/**").hasRole("ADMIN")
                 .requestMatchers("/","/index.html","/login.html","/register.html").permitAll()
                 .requestMatchers("/css/**","/favicon.ico").permitAll()
                 .anyRequest().authenticated()
