@@ -21,6 +21,7 @@ import com.mercia.weather.repository.AccessAuditRepository;
 import com.mercia.weather.repository.CityRepository;
 import com.mercia.weather.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -52,7 +53,8 @@ public class WeatherService {
 		this.cityRepo = cityRepo;
 	}
 
-	public WeatherResponseDto info(WeatherRequestDto weatherRequestDto) {
+	@Transactional(dontRollbackOn = UnavailableCity.class)
+	public WeatherResponseDto getWeatherDetails(WeatherRequestDto weatherRequestDto) {
 		String city = weatherRequestDto.getCity();
 		String state = weatherRequestDto.getState();
 		String country = weatherRequestDto.getCountry();
@@ -67,9 +69,9 @@ public class WeatherService {
 			entity.setActionDetails("user tried to fetch unavailable city");
 			entity.setStatus(Status.FAILED);
 			accessAuditRepo.save(entity);
-		}
+		
 		byNameStateCountry.orElseThrow(() -> new UnavailableCity("City you have requested is unavailable"));
-
+		}
 		WeatherResponseDto ifPresent = cacheService.getIfPresent(weatherRequestDto);
 
 		entity.setActionDetails(String.format("User fetched details for %s,%s,%s", city, state, country));
@@ -98,11 +100,11 @@ public class WeatherService {
 		cacheService.addToCache(weatherRequestDto, weatherResponseDto);
 		return weatherResponseDto;
 		}
-		catch(Exception e)// if the requested detail is not found at all
+		catch(Exception e)// if the requested city present in the db but not in the api
 		{
 			entity.setActionDetails(
 		            String.format(
-		                    "Weather API failed for %s,%s,%s",
+		                    "Weather API failed for %s,%s,%s. Please check if changed in the external API.",
 		                    city, state, country
 		            )
 		    );

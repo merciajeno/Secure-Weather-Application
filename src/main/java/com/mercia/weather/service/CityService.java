@@ -24,6 +24,7 @@ import com.mercia.weather.repository.ChangeAuditRepository;
 import com.mercia.weather.repository.CityRepository;
 import com.mercia.weather.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.ObjectMapper;
 
@@ -50,7 +51,7 @@ public class CityService {
 
 	}
 
-
+	@Transactional(dontRollbackOn = ResourceAlreadyExists.class )
 	public ResponseEntity<String> addCity(City city) {
 		String cityName = city.getCityName();
 		String state = city.getState();
@@ -66,7 +67,7 @@ public class CityService {
 
 		Optional<City> byNameStateCountry = cityRepo.findByNameStateCountry(cityName, state, country);
 		if (byNameStateCountry.isPresent()) {
-		
+
 			entity.setActionDetails("Trying to add configured city");
 			entity.setStatus(Status.FAILED);
 			accessAuditRepo.save(entity);
@@ -82,9 +83,11 @@ public class CityService {
 		return ResponseEntity.ok().body("City is saved");
 	}
 
+	@Transactional
 	public ResponseEntity<String> updateCity(City city, Long id) {
 		City existingCity = cityRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("City with id:" + id + " is not found"));
+		ChangeAudit entity = new ChangeAudit();
 
 		String cityName = city.getCityName();
 		String state = city.getState();
@@ -98,7 +101,7 @@ public class CityService {
 		existingCity.setCreatedAt(LocalDateTime.now());
 		city.setId(existingCity.getId());
 		cityRepo.save(existingCity);
-		ChangeAudit entity = new ChangeAudit();
+
 		entity.setAction(Action.CITY_UPDATED);
 		entity.setOldValue(objectMapper.writeValueAsString(existingCity));
 		entity.setNewValue(objectMapper.writeValueAsString(city));
@@ -109,6 +112,7 @@ public class CityService {
 	}
 
 
+	@Transactional
 	public ResponseEntity<String> deleteCity(Long id) {
 		City existingCity = cityRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("City with id:" + id + " is not found"));
@@ -122,7 +126,6 @@ public class CityService {
 		return ResponseEntity.status(HttpStatus.ACCEPTED).build();
 	}
 
-	
 	public ResponseEntity<List<City>> getAllCities() {
 		return ResponseEntity.ok().body(cityRepo.findAll());
 	}

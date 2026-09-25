@@ -19,8 +19,10 @@ import com.mercia.weather.repository.AccessAuditRepository;
 import com.mercia.weather.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class AuthService {
 
 	private final UserRepository userRepo;
@@ -36,7 +38,7 @@ public class AuthService {
 		this.accessAuditRepo = accessAuditRepo;
 	}
 
-
+    @Transactional
 	public ResponseEntity<String> register(RegisterRequest request) {
 		System.out.println(request.getEmail());
 		Optional<User> byEmail = userRepo.findByEmail(request.getEmail());
@@ -46,7 +48,7 @@ public class AuthService {
 		}
 		User user = new User(request.getUsername(), request.getEmail(), passwordEncoder.encode(request.getPassword()),
 				Role.USER, LocalDateTime.now());
-		System.out.println(user);
+		log.debug("User registered:"+user);
 		userRepo.save(user);
 		Long id = userRepo.findByEmail(user.getEmail()).get().getId();
 		AccessAudit entity = new AccessAudit(id, request.getUsername(), request.getEmail(), "/auth/register",
@@ -56,7 +58,7 @@ public class AuthService {
 		return ResponseEntity.ok().body("User Registered successfully");
 	}
 
-	
+	@Transactional
 	public ResponseEntity<String> login(LoginRequest request) {
 
 		String username = request.getUsername();
@@ -79,7 +81,7 @@ public class AuthService {
 		}
 
 		String token = jwtService.generateToken(username);
-
+        log.info("Token is generated");
 		AccessAudit audit = new AccessAudit(existingUser.getId(), username, existingUser.getEmail(), "/auth/login",
 				Status.SUCCESS, LocalDateTime.now());
 

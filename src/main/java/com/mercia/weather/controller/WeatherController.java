@@ -25,7 +25,7 @@ public class WeatherController {
 	public ResponseEntity<WeatherResponseDto> getInfo(@RequestBody WeatherRequestDto weatherRequestDto)
 	{
 		
-	   WeatherResponseDto response = weatherService.info(weatherRequestDto);
+	   WeatherResponseDto response = weatherService.getWeatherDetails(weatherRequestDto);
 	   return ResponseEntity.ok().body(response);
 	}
 }
