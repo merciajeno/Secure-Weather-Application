@@ -2,8 +2,10 @@ package com.mercia.weather;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
@@ -37,14 +39,12 @@ class CityControllerTest {
 
 		mockMvc.perform(get("/city/all")).andExpect(status().is(403));
 	}
-	
-    // only admin can add the city
+
+	// only admin can add the city
 	@Test
 	void addCity_whenAdmin_shouldBeAccepted() throws Exception {
 
-		mockMvc.perform(
-				post("/city").with(user("admin").roles("ADMIN"))
-				 .with(csrf())
+		mockMvc.perform(post("/city").with(user("admin").roles("ADMIN")).with(csrf())
 				.contentType(MediaType.APPLICATION_JSON).content("""
 
 						{
@@ -54,25 +54,53 @@ class CityControllerTest {
 						}
 						                        """)).andExpect(status().isOk());
 	}
-	
+
 	// user role should be rejected here
 	@Test
 	void addCity_whenUser_shouldBeRejected() throws Exception {
 
-	    mockMvc.perform(
-	            post("/city")
-	                .with(user("john").roles("USER"))
-	                .with(csrf())
-	                .contentType(MediaType.APPLICATION_JSON)
-	                .content("""
-	                    {
-	                      "cityName": "Mountain View",
-	                      "state": "California",
-	                      "country": "US"
-	                    }
-	                    """))
-	    .andExpect(status().is(403));
+		mockMvc.perform(post("/city").with(user("john").roles("USER")).with(csrf())
+				.contentType(MediaType.APPLICATION_JSON).content("""
+						{
+						  "cityName": "Mountain View",
+						  "state": "California",
+						  "country": "US"
+						}
+						""")).andExpect(status().is(403));
 	}
-	
-	
+
+	@Test
+	void updateCity_whenUser_shouldBeRejected() throws Exception {
+		mockMvc.perform(put("/city/5").with(user("john").roles("USER")).with(csrf())
+				.contentType(MediaType.APPLICATION_JSON).content("""
+						{
+						  "cityName": "Mountain View",
+						  "state": "California",
+						  "country": "US"
+						}
+						""")).andExpect(status().is(403));
+	}
+
+	@Test
+	void updateCity_whenAdmin_shouldBeAccepted() throws Exception {
+		mockMvc.perform(put("/city/5").with(user("admin").roles("ADMIN")).with(csrf())
+				.contentType(MediaType.APPLICATION_JSON).content("""
+						{
+						  "cityName": "Mountain View",
+						  "state": "California",
+						  "country": "US"
+						}
+						""")).andExpect(status().isOk());
+	}
+
+	@Test
+	void deleteCity_whenAdmin_shouldBeAccepted() throws Exception {
+		mockMvc.perform(delete("/city/5").with(user("admin").roles("ADMIN")).with(csrf())).andExpect(status().isOk());
+	}
+
+	@Test
+	void deleteCity_whenUser_shouldBeAccepted() throws Exception {
+		mockMvc.perform(delete("/city/5").with(user("john").roles("USER")).with(csrf())).andExpect(status().isForbidden());
+	}
+
 }

@@ -1,5 +1,7 @@
 package com.mercia.weather;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -28,21 +30,29 @@ public class WeatherControllerTest {
 
 	@MockitoBean
 	private JwtService jwtService;
-	
+
 	@Test
 	void getInfo_whenNotAuthenticated_shouldReturnUnauthorized() throws Exception {
 
-	    mockMvc.perform(
-	            get("/weather/getInfo")
-	                .contentType(MediaType.APPLICATION_JSON)
-	                .content("""
-	                    {
-	                      "city": "Mountain View",
-	                      "state": "California",
-	                      "country": "US"
-	                    }
-	                    """))
-	        .andExpect(status().isForbidden());
+		mockMvc.perform(get("/weather/getInfo").contentType(MediaType.APPLICATION_JSON).content("""
+				{
+				  "city": "Mountain View",
+				  "state": "California",
+				  "country": "US"
+				}
+				""")).andExpect(status().isForbidden());
 	}
 
+	@Test
+	void getInfo_whenAuthenticated_shouldBeAccepted() throws Exception {
+		mockMvc.perform(get("/weather/getInfo").with(user("admin").roles("ADMIN")).with(csrf())
+				.contentType(MediaType.APPLICATION_JSON).content("""
+
+						{
+						  "city": "Mountain View",
+						  "state": "California",
+						  "country": "US"
+						}
+						                        """)).andExpect(status().isOk());
+	}
 }

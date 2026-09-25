@@ -10,6 +10,7 @@ import com.mercia.weather.dto.LoginRequest;
 import com.mercia.weather.dto.RegisterRequest;
 import com.mercia.weather.service.AuthService;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -24,14 +25,14 @@ public class AuthController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
+	public ResponseEntity<String> register(@RequestBody @Valid RegisterRequest request) {
 
 		log.info("Register request");
 		return authService.register(request);
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+	public ResponseEntity<String> login(@RequestBody @Valid LoginRequest request) {
 
 		log.info("login request");
 		return authService.login(request);

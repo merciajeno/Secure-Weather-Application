@@ -74,10 +74,10 @@ public class AuthService {
 			AccessAudit audit = new AccessAudit(existingUser.getId(), username, existingUser.getEmail(), "/auth/login",
 					Status.FAILED, LocalDateTime.now());
 
-			audit.setActionDetails("Login failed: invalid username or password");
+			audit.setActionDetails("Login failed: invalid password");
 			accessAuditRepo.save(audit);
 
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
 		}
 
 		String token = jwtService.generateToken(username);

@@ -28,6 +28,8 @@ public class AuthControllerTest {
 
     @MockitoBean
 	private JwtService jwtService;
+    
+   
 
     @Test
     void register_whenNotAuthenticated_shouldBeAllowed() throws Exception {
@@ -44,5 +46,23 @@ public class AuthControllerTest {
                         """))
             .andExpect(status().isOk());
     }
+    
+    @Test
+    void register_InvalidEmail_shouldBeRejected() throws Exception {
+
+        mockMvc.perform(
+                post("/auth/register")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("""
+                        {
+                          "username": "john",
+                          "email":"merc",
+                          "password": "12345"
+                        }
+                        """))
+            .andExpect(status().is(400));
+    }
+    
+    
 }
 
