@@ -46,7 +46,10 @@ public class User {
 	private String username;
 
 	@Column(unique = true)
-	@Email
+	@Email(
+		    regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+		    message = "Email format must be like user@example.com"
+		)
 	private String email;
 
 	private String password;

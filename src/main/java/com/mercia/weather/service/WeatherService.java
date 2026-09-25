@@ -80,6 +80,9 @@ public class WeatherService {
 			return ifPresent;
 		}
 		String query = String.format("%s, %s, %s", city, state, country);
+		
+		try
+		{
 		@Nullable
 		String body = restClient.get().uri(uriBuilder -> uriBuilder.path("/data/2.5/weather")
 				// Combine city, state, and country code with commas
@@ -94,5 +97,22 @@ public class WeatherService {
 		weatherResponseDto.setWindSpeed(json.get("wind").get("speed").asFloat());
 		cacheService.addToCache(weatherRequestDto, weatherResponseDto);
 		return weatherResponseDto;
+		}
+		catch(Exception e)// if the requested detail is not found at all
+		{
+			entity.setActionDetails(
+		            String.format(
+		                    "Weather API failed for %s,%s,%s",
+		                    city, state, country
+		            )
+		    );
+
+		    entity.setStatus(Status.FAILED);
+		    accessAuditRepo.save(entity);
+		    throw new UnavailableCity(
+		            "Weather information is currently unavailable"
+		    );
+
+		}
 	}
 }

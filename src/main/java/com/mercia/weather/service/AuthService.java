@@ -18,6 +18,8 @@ import com.mercia.weather.exception.UserNotFoundException;
 import com.mercia.weather.repository.AccessAuditRepository;
 import com.mercia.weather.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class AuthService {
 
@@ -33,6 +35,7 @@ public class AuthService {
 		this.jwtService = jwtService;
 		this.accessAuditRepo = accessAuditRepo;
 	}
+
 
 	public ResponseEntity<String> register(RegisterRequest request) {
 		System.out.println(request.getEmail());
@@ -53,25 +56,36 @@ public class AuthService {
 		return ResponseEntity.ok().body("User Registered successfully");
 	}
 
+	
 	public ResponseEntity<String> login(LoginRequest request) {
+
 		String username = request.getUsername();
 		String password = request.getPassword();
-		User existingUser = userRepo.findByUsername(username)
-				.orElseThrow(() -> new UserNotFoundException("User Not found"));
 
-		System.out.println(existingUser);
-		// check the plain password with the existing one
+		User existingUser = userRepo.findByUsername(username)
+				.orElseThrow(() -> new UserNotFoundException("User not found"));
+
 		boolean passwordMatch = passwordEncoder.matches(password, existingUser.getPassword());
-		if (!passwordMatch || !username.equals(existingUser.getUsername())) {
-			accessAuditRepo.save(new AccessAudit(-1L, request.getUsername(), null, "/auth/register", Status.FAILED,
-					LocalDateTime.now()));
+
+		if (!passwordMatch) {
+
+			AccessAudit audit = new AccessAudit(existingUser.getId(), username, existingUser.getEmail(), "/auth/login",
+					Status.FAILED, LocalDateTime.now());
+
+			audit.setActionDetails("Login failed: invalid username or password");
+			accessAuditRepo.save(audit);
+
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
 		}
-		// get the token
+
 		String token = jwtService.generateToken(username);
-		System.out.println(token);
-		accessAuditRepo.save(new AccessAudit(existingUser.getId(), request.getUsername(), existingUser.getEmail(),
-				"/auth/login", Status.SUCCESS, LocalDateTime.now()));
+
+		AccessAudit audit = new AccessAudit(existingUser.getId(), username, existingUser.getEmail(), "/auth/login",
+				Status.SUCCESS, LocalDateTime.now());
+
+		audit.setActionDetails("User logged in successfully");
+		accessAuditRepo.save(audit);
+
 		return ResponseEntity.ok().body(token);
 	}
 

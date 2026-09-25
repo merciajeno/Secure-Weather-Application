@@ -43,7 +43,7 @@ public class JwtFilter extends OncePerRequestFilter{
 		
 		String authHeader = request.getHeader("Authorization");
 		log.info(
-				 "JWT FILTER -> " +
+				 "Incoming request: " +
 			        	    request.getMethod() + " " +
 			        	    request.getRequestURI());
 		
@@ -53,7 +53,7 @@ public class JwtFilter extends OncePerRequestFilter{
 			return;
 		}
 		
-		// to remove Bearer
+		// to remove Bearer word in the JWT
 		String token =authHeader.substring(7);
 		
 		String username = jwtService.extractUsername(token);
