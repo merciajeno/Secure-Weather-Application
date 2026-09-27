@@ -69,8 +69,8 @@ public class WeatherService {
 			entity.setActionDetails("user tried to fetch unavailable city");
 			entity.setStatus(Status.FAILED);
 			accessAuditRepo.save(entity);
-		
-		byNameStateCountry.orElseThrow(() -> new UnavailableCity("City you have requested is unavailable"));
+
+			byNameStateCountry.orElseThrow(() -> new UnavailableCity("City you have requested is unavailable"));
 		}
 		WeatherResponseDto ifPresent = cacheService.getIfPresent(weatherRequestDto);
 
@@ -82,38 +82,32 @@ public class WeatherService {
 			return ifPresent;
 		}
 		String query = String.format("%s, %s, %s", city, state, country);
-		
-		try
-		{
-		@Nullable
-		String body = restClient.get().uri(uriBuilder -> uriBuilder.path("/data/2.5/weather")
-				// Combine city, state, and country code with commas
-				.queryParam("q", query).queryParam("units", "metric").queryParam("appid", apiKey).build()).retrieve()
-				.body(String.class);
 
-		JsonNode json = objectMapper.readTree(body);
-		WeatherResponseDto weatherResponseDto = new WeatherResponseDto();
-		weatherResponseDto.setPressure(json.get("main").get("pressure").asFloat());
-		weatherResponseDto.setHumidity(json.get("main").get("humidity").asFloat());
-		weatherResponseDto.setTemperature(json.get("main").get("temp").asFloat());
-		weatherResponseDto.setWindSpeed(json.get("wind").get("speed").asFloat());
-		cacheService.addToCache(weatherRequestDto, weatherResponseDto);
-		return weatherResponseDto;
-		}
-		catch(Exception e)// if the requested city present in the db but not in the api
+		try {
+			@Nullable
+			String body = restClient.get().uri(uriBuilder -> uriBuilder.path("/data/2.5/weather")
+					// Combine city, state, and country code with commas
+					.queryParam("q", query).queryParam("units", "metric").queryParam("appid", apiKey).build())
+					.retrieve().body(String.class);
+
+			JsonNode json = objectMapper.readTree(body);
+			WeatherResponseDto weatherResponseDto = new WeatherResponseDto();
+			weatherResponseDto.setPressure(json.get("main").get("pressure").asFloat());
+			weatherResponseDto.setHumidity(json.get("main").get("humidity").asFloat());
+			weatherResponseDto.setTemperature(json.get("main").get("temp").asFloat());
+			weatherResponseDto.setWindSpeed(json.get("wind").get("speed").asFloat());
+			cacheService.addToCache(weatherRequestDto, weatherResponseDto);
+			return weatherResponseDto;
+
+		} catch (Exception e)// if the requested city present in the db but not in the api
 		{
 			entity.setActionDetails(
-		            String.format(
-		                    "Weather API failed for %s,%s,%s. Please check if changed in the external API.",
-		                    city, state, country
-		            )
-		    );
+					String.format("Weather API failed for %s,%s,%s. Please check if changed in the external API.", city,
+							state, country));
 
-		    entity.setStatus(Status.FAILED);
-		    accessAuditRepo.save(entity);
-		    throw new UnavailableCity(
-		            "Weather information is currently unavailable"
-		    );
+			entity.setStatus(Status.FAILED);
+			accessAuditRepo.save(entity);
+			throw new UnavailableCity("Weather information is currently unavailable");
 
 		}
 	}

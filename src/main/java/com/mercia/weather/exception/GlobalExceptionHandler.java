@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -26,5 +28,16 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(UnavailableCity.class)
 	public ResponseEntity<String> cityNotIncluded(UnavailableCity ex) {
 		return ResponseEntity.badRequest().body(ex.getMessage());
+	}
+
+	@ExceptionHandler(ResourceAccessException.class)
+	public ResponseEntity<String> handleResourceAccess(ResourceAccessException ex) {
+
+		return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body("External service is unavailable");
+	}
+
+	@ExceptionHandler(HttpServerErrorException.class)
+	public ResponseEntity<String> handleExternalAPIFailure(HttpServerErrorException ex) {
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Service is down");
 	}
 }

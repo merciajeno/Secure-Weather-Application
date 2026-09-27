@@ -1,4 +1,4 @@
-package com.mercia.weather;
+package com.mercia.weather.controller;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -17,7 +17,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.mercia.weather.config.SecurityConfig;
-import com.mercia.weather.controller.CityController;
 import com.mercia.weather.service.CityService;
 import com.mercia.weather.service.JwtService;
 

@@ -40,7 +40,6 @@ public class AuthService {
 
     @Transactional
 	public ResponseEntity<String> register(RegisterRequest request) {
-		System.out.println(request.getEmail());
 		Optional<User> byEmail = userRepo.findByEmail(request.getEmail());
 		Optional<User> byUsername = userRepo.findByUsername(request.getUsername());
 		if (byEmail.isPresent() || byUsername.isPresent()) {
@@ -49,9 +48,9 @@ public class AuthService {
 		User user = new User(request.getUsername(), request.getEmail(), passwordEncoder.encode(request.getPassword()),
 				Role.USER, LocalDateTime.now());
 		log.debug("User registered:"+user);
-		userRepo.save(user);
-		Long id = userRepo.findByEmail(user.getEmail()).get().getId();
-		AccessAudit entity = new AccessAudit(id, request.getUsername(), request.getEmail(), "/auth/register",
+		User savedUser = userRepo.save(user);
+		
+		AccessAudit entity = new AccessAudit(savedUser.getId(), request.getUsername(), request.getEmail(), "/auth/register",
 				Status.SUCCESS, LocalDateTime.now());
 		entity.setActionDetails("Registered ");
 		accessAuditRepo.save(entity);

@@ -1,9 +1,13 @@
 package com.mercia.weather.config;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,57 +26,57 @@ import tools.jackson.databind.ObjectMapper;
 @Configuration
 public class SecurityConfig {
 
-	
-	@Bean SecurityFilterChain securityFilterChain(HttpSecurity http,JwtFilter jwtFilter) throws Exception {
-        http
-        .csrf(csrf -> csrf
-                .disable())
-        .addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class)
-            
-            .authorizeHttpRequests(auth -> auth
-            
-                .requestMatchers("/auth/register","/auth/login").permitAll()
-                .requestMatchers("/city/**").hasRole("ADMIN")
-                .requestMatchers("/weather/**").hasAnyRole("ADMIN","USER")
-                .requestMatchers("/audit/**").hasRole("ADMIN")
-                
-                //frontend stuffs
-                .requestMatchers("/","/index.html","/login.html","/register.html","/weather.html").permitAll()
-                .requestMatchers("/css/**","/favicon.ico").permitAll()
-                .anyRequest().authenticated()
-                
-                
-            );
-
-        return http.build();
-    }
-	
 	@Bean
-	PasswordEncoder passwordEncoder()
-	{
+	SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
+		http.csrf(csrf -> csrf.disable()).addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+
+				.authorizeHttpRequests(auth -> auth
+
+						.requestMatchers("/auth/register", "/auth/login").permitAll().requestMatchers("/city/**")
+						.hasRole("ADMIN").requestMatchers("/weather/**").hasAnyRole("ADMIN", "USER")
+						.requestMatchers("/audit/**").hasRole("ADMIN")
+
+						// frontend stuffs
+						.requestMatchers("/", "/index.html", "/login.html", "/register.html", "/weather.html")
+						.permitAll().requestMatchers("/css/**", "/favicon.ico").permitAll().anyRequest().authenticated()
+
+				);
+
+		return http.build();
+	}
+
+	@Bean
+	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
+
 	@Bean
-	RestClient restClient()
-	{
-		return RestClient.builder()
-				.baseUrl("http://api.openweathermap.org")
+	HttpClient httpClient() {
+		return HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
+	}
+
+	@Bean
+	ClientHttpRequestFactory getClientHttpRequestFactory() {
+		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+		factory.setReadTimeout(6000);
+		factory.setConnectTimeout(6000);
+		return factory;
+	}
+
+	@Bean
+	RestClient restClient(HttpClient httpClient, ClientHttpRequestFactory clientRequestFactory) {
+
+		return RestClient.builder().requestFactory(clientRequestFactory).baseUrl("http://api.openweathermap.org")
 				.build();
 	}
-	
+
 	@Bean
-	Cache<WeatherRequestDto, WeatherResponseDto> cache()
-	{
-		return Caffeine.newBuilder()
-	            .maximumSize(200)
-	            .expireAfterWrite(10, TimeUnit.MINUTES)
-	            .build();
+	Cache<WeatherRequestDto, WeatherResponseDto> cache() {
+		return Caffeine.newBuilder().maximumSize(200).expireAfterWrite(10, TimeUnit.MINUTES).build();
 	}
-	
+
 	@Bean
-	ObjectMapper objectMapper()
-	{
+	ObjectMapper objectMapper() {
 		return new ObjectMapper();
 	}
 }

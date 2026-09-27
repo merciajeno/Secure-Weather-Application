@@ -28,13 +28,12 @@ public class City {
 	@NotNull
 	private String cityName;
 
-	private String country;
-
 	private String state;
 
+	private String country;
 	private LocalDateTime createdAt;
 
-	public City(String cityName, String country, String state) {
+	public City(String cityName, String state, String country) {
 		this.cityName = cityName;
 		this.country = country;
 		this.createdAt = LocalDateTime.now();

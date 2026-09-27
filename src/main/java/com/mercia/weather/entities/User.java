@@ -22,12 +22,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class User {
 
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", username=" + username + ", email=" + email + ", password=" + password + ", role="
-				+ role + ", createdAt=" + createdAt + "]";
-	}
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -46,10 +40,7 @@ public class User {
 	private String username;
 
 	@Column(unique = true)
-	@Email(
-		    regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-		    message = "Email format must be like user@example.com"
-		)
+	@Email(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Email format must be like user@example.com")
 	private String email;
 
 	private String password;
