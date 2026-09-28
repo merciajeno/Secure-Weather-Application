@@ -1,5 +1,6 @@
 package com.mercia.weather.exception;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -39,5 +40,10 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(HttpServerErrorException.class)
 	public ResponseEntity<String> handleExternalAPIFailure(HttpServerErrorException ex) {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Service is down");
+	}
+
+	@ExceptionHandler(DataAccessException.class)
+	public ResponseEntity<String> handleDBException(DataAccessException e) {
+		return ResponseEntity.internalServerError().body("Database is facing problem");
 	}
 }
