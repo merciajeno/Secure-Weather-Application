@@ -51,7 +51,6 @@ class AuthServiceTest {
 	@Test
 	void login_shouldLoginSuccessfully() {
 
-		// Arrange
 		LoginRequest request = new LoginRequest("john", "password123");
 
 		User user = new User("john", "john@gmail.com", "encodedPassword", Role.USER, LocalDateTime.now());
@@ -64,10 +63,8 @@ class AuthServiceTest {
 
 		when(jwtService.generateToken("john")).thenReturn("fake-jwt-token");
 
-		// Act
 		ResponseEntity<String> response = authService.login(request);
 
-		// Assert
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals("fake-jwt-token", response.getBody());
 
@@ -87,12 +84,8 @@ class AuthServiceTest {
 
 		when(userRepo.findByUsername("john")).thenReturn(Optional.of(user));
 
-		when(passwordEncoder.matches("wrongPassword", "encodedPassword")).thenReturn(false);
-
-		// Act
 		ResponseEntity<String> response = authService.login(request);
 
-		// Assert
 		assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
 
 		assertEquals("Invalid password", response.getBody());
@@ -125,10 +118,9 @@ class AuthServiceTest {
 		verify(userRepo).save(any(User.class));
 		verify(accessAuditRepo).save(any(AccessAudit.class));
 	}
-	
+
 	@Test
-	void register_userExists_shouldFail()
-	{
+	void register_userExists_shouldFail() {
 		RegisterRequest request = new RegisterRequest("john", "merc@co.in", "password");
 
 		User savedUser = new User("john", "merc@co.in", "encodedPassword", Role.USER, LocalDateTime.now());
@@ -137,9 +129,9 @@ class AuthServiceTest {
 		when(userRepo.findByUsername("john")).thenReturn(Optional.of(savedUser));
 
 		when(userRepo.findByEmail("merc@co.in")).thenReturn(Optional.of(savedUser));
-		
+
 		ResponseEntity<String> response = authService.register(request);
-		
-		assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
+
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 	}
 }

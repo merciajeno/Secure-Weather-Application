@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -55,10 +56,10 @@ class CityServiceTest {
 
 	@InjectMocks
 	private CityService cityService;
-	
+
 	@AfterEach
 	void clearSecurityContext() {
-	    SecurityContextHolder.clearContext();
+		SecurityContextHolder.clearContext();
 	}
 
 	@Test
@@ -87,6 +88,15 @@ class CityServiceTest {
 	}
 
 	@Test
+	void getCities_DbFailure_Failed() {
+		when(cityRepo.findAll()).thenThrow(new DataAccessException("Database is facing problem") {
+		});
+		assertThrows(DataAccessException.class, () -> {
+			cityService.getAllCities();
+		});
+	}
+
+	@Test
 	void addCity_ifConfigured_Failed() {
 
 		City city = new City("Bengaluru", "Karnataka", "IN");
@@ -108,7 +118,7 @@ class CityServiceTest {
 
 		when(cityRepo.findByNameStateCountry("Bengaluru", "Karnataka", "IN")).thenReturn(Optional.of(city));
 
-		assertThrows(ResourceAlreadyExists.class,()->{
+		assertThrows(ResourceAlreadyExists.class, () -> {
 			cityService.addCity(city);
 		});
 		verify(accessAuditRepo).save(any(AccessAudit.class));
@@ -173,7 +183,7 @@ class CityServiceTest {
 		when(cityRepo.findById(1L)).thenReturn(Optional.of(city));
 		ResponseEntity<String> deleteCity = cityService.deleteCity(1L);
 		assertEquals(HttpStatus.ACCEPTED, deleteCity.getStatusCode());
-        
+
 	}
 
 	@Test

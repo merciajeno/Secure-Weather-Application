@@ -58,8 +58,9 @@ class WeatherServiceTest {
 
 	@AfterEach
 	void clearSecurityContext() {
-	    SecurityContextHolder.clearContext();
+		SecurityContextHolder.clearContext();
 	}
+
 	@Test
 	void whenCityDoesNotExist_failed() {
 
@@ -96,47 +97,49 @@ class WeatherServiceTest {
 		// Verify failed audit was saved
 		verify(accessAuditRepo).save(any(AccessAudit.class));
 	}
-	
+
 	@Test
 	void shouldReturnWeatherFromCache() {
 
-	    WeatherRequestDto request = new WeatherRequestDto();
-	    request.setCity("Bengaluru");
-	    request.setState("Karnataka");
-	    request.setCountry("IN");
+		WeatherRequestDto request = new WeatherRequestDto();
+		request.setCity("Bengaluru");
+		request.setState("Karnataka");
+		request.setCountry("IN");
 
-	    User user = new User();
-	    user.setId(1L);
-	    user.setUsername("john");
-	    user.setEmail("john@gmail.com");
+		User user = new User();
+		user.setId(1L);
+		user.setUsername("john");
+		user.setEmail("john@gmail.com");
 
-	    WeatherResponseDto cachedWeather = new WeatherResponseDto();
-	    cachedWeather.setTemperature(25.0f);
+		WeatherResponseDto cachedWeather = new WeatherResponseDto();
+		cachedWeather.setTemperature(25.0f);
+		cachedWeather.setHumidity(1000f);
+		cachedWeather.setPressure(1000f);
+		cachedWeather.setWindSpeed(30f);
 
-	    when(userRepo.findByUsername("john"))
-	            .thenReturn(Optional.of(user));
+		when(userRepo.findByUsername("john")).thenReturn(Optional.of(user));
 
-	    when(cityRepo.findByNameStateCountry(
-	            "Bengaluru", "Karnataka", "IN"
-	    )).thenReturn(Optional.of(new City()));
+		when(cityRepo.findByNameStateCountry("Bengaluru", "Karnataka", "IN")).thenReturn(Optional.of(new City()));
 
-	    when(cacheService.getIfPresent(request))
-	            .thenReturn(cachedWeather);
+		when(cacheService.getIfPresent(request)).thenReturn(cachedWeather);
 
-	    // SecurityContext setup
-	    Authentication authentication = mock(Authentication.class);
-	    when(authentication.getName()).thenReturn("john");
+		// SecurityContext setup
+		Authentication authentication = mock(Authentication.class);
+		when(authentication.getName()).thenReturn("john");
 
-	    SecurityContext securityContext = mock(SecurityContext.class);
-	    when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContext securityContext = mock(SecurityContext.class);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
 
-	    SecurityContextHolder.setContext(securityContext);
+		SecurityContextHolder.setContext(securityContext);
 
-	    WeatherResponseDto result =
-	            weatherService.getWeatherDetails(request);
+		WeatherResponseDto result = weatherService.getWeatherDetails(request);
 
-	    assertEquals(25.0f, result.getTemperature());
+		assertEquals(25.0f, result.getTemperature());
+		assertEquals(1000f, result.getHumidity());
+		assertEquals(1000f, result.getPressure());
+		assertEquals(30f, result.getWindSpeed());
 
-	    verify(cacheService).getIfPresent(request);
+		verify(cacheService).getIfPresent(request);
 	}
+
 }

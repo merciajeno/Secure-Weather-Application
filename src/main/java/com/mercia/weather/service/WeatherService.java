@@ -108,6 +108,7 @@ public class WeatherService {
 			entity.setStatus(Status.FAILED);
 			accessAuditRepo.save(entity);
 			throw new UnavailableCity("Weather information is currently unavailable");
+			// handled in global exception but need to audit so the exception is handled here.
 
 		}
 	}
