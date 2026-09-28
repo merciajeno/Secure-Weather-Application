@@ -39,6 +39,7 @@ public class ApplicationConfig {
 
 						// frontend stuffs
 						.requestMatchers("/", "/index.html", "/login.html", "/register.html").permitAll()
+						.requestMatchers("/admin.html").hasRole("ADMIN")
 						.requestMatchers("/css/**", "/favicon.ico").permitAll().anyRequest().authenticated()
 
 				);

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin - City Management</title>
+</head>
+
+<body>
+
+	<h1>City Management</h1>
+
+	<h2>Add City</h2>
+
+	<form id="cityForm">
+
+		<input type="text" id="cityName" placeholder="City Name" required>
+
+		<input type="text" id="state" placeholder="State" required>
+
+		<input type="text" id="country" placeholder="Country" required>
+
+		<button type="submit">Add City</button>
+
+	</form>
+
+	<hr>
+
+	<h2>Existing Cities</h2>
+
+	<div id="cities"></div>
+
+	<script>
+
+        async function loadCities() {
+
+            try {
+
+                const response = await fetch("/city/all", {
+                    method: "GET",
+                    credentials: "include"
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to load cities");
+                }
+
+                const cities = await response.json();
+
+                displayCities(cities);
+
+            } catch (error) {
+
+                console.error("Error:", error);
+
+            }
+        }
+
+
+        function displayCities(cities) {
+
+            const citiesContainer =
+                document.getElementById("cities");
+
+            citiesContainer.innerHTML = "";
+
+            cities.forEach(city => {
+
+                const cityDiv = document.createElement("div");
+
+                cityDiv.innerHTML = `
+
+                    <p>
+                        <strong>ID:</strong> ${city.id}
+                    </p>
+
+                    <p>
+                        <strong>City:</strong>
+                        <input
+                            type="text"
+                            id="cityName-${city.id}"
+                            value="${city.cityName}"
+                        >
+                    </p>
+
+                    <p>
+                        <strong>State:</strong>
+                        <input
+                            type="text"
+                            id="state-${city.id}"
+                            value="${city.state}"
+                        >
+                    </p>
+
+                    <p>
+                        <strong>Country:</strong>
+                        <input
+                            type="text"
+                            id="country-${city.id}"
+                            value="${city.country}"
+                        >
+                    </p>
+
+                    <button onclick="updateCity(${city.id})">
+                        Update
+                    </button>
+
+                    <button onclick="deleteCity(${city.id})">
+                        Delete
+                    </button>
+
+                    <hr>
+
+                `;
+
+                citiesContainer.appendChild(cityDiv);
+
+            });
+        }
+
+
+        async function addCity(event) {
+
+            event.preventDefault();
+
+            const cityName =
+                document.getElementById("cityName").value;
+
+            const state =
+                document.getElementById("state").value;
+
+            const country =
+                document.getElementById("country").value;
+
+
+            const city = {
+                cityName: cityName,
+                state: state,
+                country: country
+            };
+
+
+            try {
+
+                const response = await fetch("/city", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    credentials: "include",
+
+                    body: JSON.stringify(city)
+
+                });
+
+
+                if (!response.ok) {
+                    throw new Error("Failed to create city");
+                }
+
+
+                document.getElementById("cityForm").reset();
+
+                await loadCities();
+
+            } catch (error) {
+
+                console.error("Error:", error);
+
+            }
+        }
+
+
+        async function updateCity(id) {
+
+            const cityName =
+                document.getElementById(`cityName-${id}`).value;
+
+            const state =
+                document.getElementById(`state-${id}`).value;
+
+            const country =
+                document.getElementById(`country-${id}`).value;
+
+
+            const city = {
+                cityName: cityName,
+                state: state,
+                country: country
+            };
+
+
+            try {
+
+                const response = await fetch(`/city/${id}`, {
+
+                    method: "PUT",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    credentials: "include",
+
+                    body: JSON.stringify(city)
+
+                });
+
+
+                if (!response.ok) {
+                    throw new Error("Failed to update city");
+                }
+
+
+                await loadCities();
+
+            } catch (error) {
+
+                console.error("Error:", error);
+
+            }
+        }
+
+
+        async function deleteCity(id) {
+
+            try {
+
+                const response = await fetch(`/city/${id}`, {
+
+                    method: "DELETE",
+
+                    credentials: "include"
+
+                });
+
+
+                if (!response.ok) {
+                    throw new Error("Failed to delete city");
+                }
+
+
+                await loadCities();
+
+            } catch (error) {
+
+                console.error("Error:", error);
+
+            }
+        }
+
+
+        document
+            .getElementById("cityForm")
+            .addEventListener("submit", addCity);
+
+
+        loadCities();
+
+    </script>
+
+</body>
+</html>
