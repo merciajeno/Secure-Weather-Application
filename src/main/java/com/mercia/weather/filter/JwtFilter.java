@@ -15,63 +15,64 @@ import com.mercia.weather.service.JwtService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class JwtFilter extends OncePerRequestFilter{
+public class JwtFilter extends OncePerRequestFilter {
 
 	private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
-  
+	private final UserDetailsService userDetailsService;
 
-    public JwtFilter(
-            JwtService jwtService,
-            UserDetailsService userDetailsService) {
+	public JwtFilter(JwtService jwtService, UserDetailsService userDetailsService) {
 
-        this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
-		
-    }
-    
+		this.jwtService = jwtService;
+		this.userDetailsService = userDetailsService;
+
+	}
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		
-		String authHeader = request.getHeader("Authorization");
-		log.info(
-				 "Incoming request: " +
-			        	    request.getMethod() + " " +
-			        	    request.getRequestURI());
-		
-		if(authHeader==null || !authHeader.startsWith("Bearer"))
-		{
+
+		// String authHeader = request.getHeader("Authorization");
+		log.info("Incoming request: " + request.getMethod() + " " + request.getRequestURI());
+
+//		if(authHeader==null || !authHeader.startsWith("Bearer"))
+//		{
+//			filterChain.doFilter(request, response);
+//			return;
+//		}
+//		
+//		// to remove Bearer word in the JWT
+//		String token =authHeader.substring(7);
+		String token = null;
+		for (Cookie cookie : request.getCookies()) {
+			if (cookie.getName().equals("token"))
+			{
+				token = cookie.getValue();
+				break;
+			}
+		}
+		if (token == null) {
 			filterChain.doFilter(request, response);
 			return;
 		}
-		
-		// to remove Bearer word in the JWT
-		String token =authHeader.substring(7);
-		
 		String username = jwtService.extractUsername(token);
-		
-		UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-		
-		 Authentication authentication =
-	                new UsernamePasswordAuthenticationToken(
-	                        userDetails,
-	                        null,
-	                        userDetails.getAuthorities()
-	                );
 
-		
+		UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
+				userDetails.getAuthorities());
+
 		SecurityContext context = SecurityContextHolder.getContext();
 		context.setAuthentication(authentication);
-		
-	    filterChain.doFilter(request, response);
+
+		filterChain.doFilter(request, response);
 	}
 
 }

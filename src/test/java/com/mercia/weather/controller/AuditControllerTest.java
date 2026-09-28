@@ -11,13 +11,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.mercia.weather.config.SecurityConfig;
+import com.mercia.weather.config.ApplicationConfig;
 import com.mercia.weather.repository.AccessAuditRepository;
 import com.mercia.weather.repository.ChangeAuditRepository;
 import com.mercia.weather.service.JwtService;
 
 @WebMvcTest(AuditController.class)
-@Import(SecurityConfig.class)
+@Import(ApplicationConfig.class)
 public class AuditControllerTest {
 
 	@Autowired

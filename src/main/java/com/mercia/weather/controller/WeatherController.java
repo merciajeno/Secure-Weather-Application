@@ -1,7 +1,7 @@
 package com.mercia.weather.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,17 +15,15 @@ import com.mercia.weather.service.WeatherService;
 public class WeatherController {
 
 	private final WeatherService weatherService;
-	
-	public WeatherController(WeatherService weatherService)
-	{
+
+	public WeatherController(WeatherService weatherService) {
 		this.weatherService = weatherService;
 	}
-	
-	@GetMapping("/getInfo")
-	public ResponseEntity<WeatherResponseDto> getInfo(@RequestBody WeatherRequestDto weatherRequestDto)
-	{
-		
-	   WeatherResponseDto response = weatherService.getWeatherDetails(weatherRequestDto);
-	   return ResponseEntity.ok().body(response);
+
+	@PostMapping("/getInfo")
+	public ResponseEntity<WeatherResponseDto> getInfo(@RequestBody WeatherRequestDto weatherRequestDto) {
+
+		WeatherResponseDto response = weatherService.getWeatherDetails(weatherRequestDto);
+		return ResponseEntity.ok().body(response);
 	}
 }

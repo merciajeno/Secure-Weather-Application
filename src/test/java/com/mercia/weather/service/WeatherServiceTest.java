@@ -121,7 +121,7 @@ class WeatherServiceTest {
 
 		when(cityRepo.findByNameStateCountry("Bengaluru", "Karnataka", "IN")).thenReturn(Optional.of(new City()));
 
-		when(cacheService.getIfPresent(request)).thenReturn(cachedWeather);
+		when(cacheService.getWeatherDetailsIfPresent(request)).thenReturn(cachedWeather);
 
 		// SecurityContext setup
 		Authentication authentication = mock(Authentication.class);
@@ -139,7 +139,7 @@ class WeatherServiceTest {
 		assertEquals(1000f, result.getPressure());
 		assertEquals(30f, result.getWindSpeed());
 
-		verify(cacheService).getIfPresent(request);
+		verify(cacheService).getWeatherDetailsIfPresent(request);
 	}
 
 }

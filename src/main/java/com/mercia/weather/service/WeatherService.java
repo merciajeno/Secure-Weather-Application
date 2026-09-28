@@ -3,12 +3,9 @@ package com.mercia.weather.service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.jspecify.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
 import com.mercia.weather.dto.WeatherRequestDto;
 import com.mercia.weather.dto.WeatherResponseDto;
@@ -22,20 +19,15 @@ import com.mercia.weather.repository.CityRepository;
 import com.mercia.weather.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@AllArgsConstructor
+@Slf4j
 public class WeatherService {
 
-	@Value("${api.key}")
-	private String apiKey;
-
-	private final RestClient restClient;
-
 	private final CacheService cacheService;
-
-	private final ObjectMapper objectMapper;
 
 	private final AccessAuditRepository accessAuditRepo;
 
@@ -43,22 +35,14 @@ public class WeatherService {
 
 	private final CityRepository cityRepo;
 
-	public WeatherService(RestClient restClient, CacheService cacheService, ObjectMapper objectMapper,
-			AccessAuditRepository accessAuditRepo, UserRepository userRepo, CityRepository cityRepo) {
-		this.restClient = restClient;
-		this.cacheService = cacheService;
-		this.objectMapper = objectMapper;
-		this.accessAuditRepo = accessAuditRepo;
-		this.userRepo = userRepo;
-		this.cityRepo = cityRepo;
-	}
+	private final WeatherApiClientService weatherApiClientService;
 
 	@Transactional(dontRollbackOn = UnavailableCity.class)
 	public WeatherResponseDto getWeatherDetails(WeatherRequestDto weatherRequestDto) {
 		String city = weatherRequestDto.getCity();
 		String state = weatherRequestDto.getState();
 		String country = weatherRequestDto.getCountry();
-
+         log.info(String.format("Requested:%s ,%s, %s", city,state,country));
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String name = authentication.getName();
 		User user = userRepo.findByUsername(name).get();
@@ -72,7 +56,7 @@ public class WeatherService {
 
 			byNameStateCountry.orElseThrow(() -> new UnavailableCity("City you have requested is unavailable"));
 		}
-		WeatherResponseDto ifPresent = cacheService.getIfPresent(weatherRequestDto);
+		WeatherResponseDto ifPresent = cacheService.getWeatherDetailsIfPresent(weatherRequestDto);
 
 		entity.setActionDetails(String.format("User fetched details for %s,%s,%s", city, state, country));
 		entity.setStatus(Status.SUCCESS);
@@ -84,18 +68,8 @@ public class WeatherService {
 		String query = String.format("%s, %s, %s", city, state, country);
 
 		try {
-			@Nullable
-			String body = restClient.get().uri(uriBuilder -> uriBuilder.path("/data/2.5/weather")
-					// Combine city, state, and country code with commas
-					.queryParam("q", query).queryParam("units", "metric").queryParam("appid", apiKey).build())
-					.retrieve().body(String.class);
 
-			JsonNode json = objectMapper.readTree(body);
-			WeatherResponseDto weatherResponseDto = new WeatherResponseDto();
-			weatherResponseDto.setPressure(json.get("main").get("pressure").asFloat());
-			weatherResponseDto.setHumidity(json.get("main").get("humidity").asFloat());
-			weatherResponseDto.setTemperature(json.get("main").get("temp").asFloat());
-			weatherResponseDto.setWindSpeed(json.get("wind").get("speed").asFloat());
+			WeatherResponseDto weatherResponseDto = weatherApiClientService.getWeatherDetailsFromApi(query);
 			cacheService.addToCache(weatherRequestDto, weatherResponseDto);
 			return weatherResponseDto;
 
@@ -108,7 +82,8 @@ public class WeatherService {
 			entity.setStatus(Status.FAILED);
 			accessAuditRepo.save(entity);
 			throw new UnavailableCity("Weather information is currently unavailable");
-			// handled in global exception but need to audit so the exception is handled here.
+			// handled in global exception but need to audit so the exception is handled
+			// here.
 
 		}
 	}

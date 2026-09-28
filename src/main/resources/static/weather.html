@@ -1,21 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web</title>
-    <script>
-        const token = localStorage.getItem("token")
-        if (!token) {
-            // No token found, redirect them back to login immediately
-            window.location.href = "/login.html";
-        }
-    </script>
+<meta charset="UTF-8">
+<title>Weather</title>
 </head>
+
 <body>
-    
-</body>
-<script>
-    
+
+	<h1>Weather</h1>
+
+	<div id="cities"></div>
+	<div id="weatherDetails">
+
+		<h2>Weather Details</h2>
+
+		<p>
+			Temperature: <span id="temperature">-</span>
+		</p>
+		<p>
+			Pressure: <span id="pressure">-</span>
+		</p>
+		<p>
+			Humidity: <span id="humidity">-</span>
+		</p>
+		<p>
+			Wind Speed: <span id="windSpeed">-</span>
+		</p>
+
+	</div>
+	<script>
+
+	function displayWeather(weather) {
+
+	    document.getElementById("temperature").textContent =
+	        weather.temperature;
+
+	    document.getElementById("pressure").textContent =
+	        weather.pressure;
+
+	    document.getElementById("humidity").textContent =
+	        weather.humidity;
+
+	    document.getElementById("windSpeed").textContent =
+	        weather.windSpeed;
+	}
+	
+    async function loadCities() {
+
+        try {
+
+            const response = await fetch("/city/all", {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to load cities");
+            }
+
+            const cities = await response.json();
+
+            console.log(cities);
+
+            const citiesContainer =
+                document.getElementById("cities");
+
+            cities.forEach(city => {
+
+                const button = document.createElement("button");
+                console.log(city)
+                button.textContent = city.cityName;
+
+                button.addEventListener("click", () => {
+                    loadWeather(city);
+                });
+
+                citiesContainer.appendChild(button);
+            });
+
+        } catch (error) {
+
+            console.error("Error:", error);
+
+        }
+    }
+
+    async function loadWeather(city) {
+
+        try {
+
+            const response = await fetch("/weather/getInfo", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    city: city.cityName,
+                    state: city.state,
+                    country: city.country
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to get weather information");
+            }
+
+            const weather = await response.json();
+
+            console.log("Weather:", weather);
+
+            displayWeather(weather);
+
+        } catch (error) {
+
+            console.error("Error:", error);
+
+        }
+    }
+
+    loadCities();
+
 </script>
+
+</body>
 </html>

@@ -1,28 +1,21 @@
 package com.mercia.weather.service;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class JwtService {
 
 	private final SecretKey secretKey;
-
-	public JwtService(@Value("${secret.key}") String secret) {
-
-		this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-
-	}
 
 	public String generateToken(String username) {
 

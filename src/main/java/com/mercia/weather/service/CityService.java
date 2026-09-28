@@ -26,11 +26,13 @@ import com.mercia.weather.repository.CityRepository;
 import com.mercia.weather.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.ObjectMapper;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class CityService {
 	private final CityRepository cityRepo;
 
@@ -42,17 +44,7 @@ public class CityService {
 
 	private final UserRepository userRepo;
 
-	CityService(CityRepository cityRepo, ChangeAuditRepository changeAuditRepo, ObjectMapper objectMapper,
-			AccessAuditRepository accessAuditRepo, UserRepository userRepo) {
-		this.cityRepo = cityRepo;
-		this.changeAuditRepo = changeAuditRepo;
-		this.accessAuditRepo = accessAuditRepo;
-		this.objectMapper = objectMapper;
-		this.userRepo = userRepo;
-
-	}
-
-	@Transactional(dontRollbackOn = ResourceAlreadyExists.class )
+	@Transactional(dontRollbackOn = ResourceAlreadyExists.class)
 	public ResponseEntity<String> addCity(City city) {
 		String cityName = city.getCityName();
 		String state = city.getState();
@@ -115,7 +107,6 @@ public class CityService {
 		changeAuditRepo.save(entity);
 		return ResponseEntity.status(201).build();
 	}
-
 
 	@Transactional
 	public ResponseEntity<String> deleteCity(Long id) {

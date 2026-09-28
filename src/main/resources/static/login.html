@@ -33,27 +33,32 @@
 <script>
 
     const form = document.getElementById("form")
-    form.addEventListener('submit', async function (e) {
-  e.preventDefault();
-  const formData = new FormData(form);
-  const jsonPayload = Object.fromEntries(formData.entries());
-  console.log("Hi")
-console.log(jsonPayload)
-try {
-    const response = await fetch('http://localhost:8080/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(jsonPayload)
-    });
-    console.log(response);
-    const data = await response.text();
-    localStorage.setItem('token', data);
-    console.log("data", data);
-    
-    
-  } catch (error) {
-    console.error('Error:', error);
-  }
-    })
+    form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const jsonPayload = Object.fromEntries(formData.entries());
+
+    try {
+        const response = await fetch("/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include",
+            body: JSON.stringify(jsonPayload)
+        });
+
+        if (response.ok) {
+            window.location.href = "/weather.html";
+        } else {
+            const message = await response.text();
+            console.log(message);
+        }
+
+    } catch (error) {
+        console.error("Error:", error);
+    }
+});
 </script>
 </html>

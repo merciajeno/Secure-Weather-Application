@@ -16,12 +16,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.mercia.weather.config.SecurityConfig;
+import com.mercia.weather.config.ApplicationConfig;
 import com.mercia.weather.service.CityService;
 import com.mercia.weather.service.JwtService;
 
 @WebMvcTest(CityController.class)
-@Import(SecurityConfig.class)
+@Import(ApplicationConfig.class)
 class CityControllerTest {
 
 	@Autowired

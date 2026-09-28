@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,10 +22,8 @@ import com.mercia.weather.dto.WeatherRequestDto;
 import com.mercia.weather.dto.WeatherResponseDto;
 import com.mercia.weather.filter.JwtFilter;
 
-import tools.jackson.databind.ObjectMapper;
-
 @Configuration
-public class SecurityConfig {
+public class ApplicationConfig {
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
@@ -32,13 +31,15 @@ public class SecurityConfig {
 
 				.authorizeHttpRequests(auth -> auth
 
-						.requestMatchers("/auth/register", "/auth/login").permitAll().requestMatchers("/city/**")
-						.hasRole("ADMIN").requestMatchers("/weather/**").hasAnyRole("ADMIN", "USER")
-						.requestMatchers("/audit/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.POST, "/city/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.DELETE, "/city/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.PUT, "/city/**").hasRole("ADMIN")
+						.requestMatchers("/auth/register", "/auth/login").permitAll().requestMatchers("/weather/**")
+						.hasAnyRole("ADMIN", "USER").requestMatchers("/audit/**").hasRole("ADMIN")
 
 						// frontend stuffs
-						.requestMatchers("/", "/index.html", "/login.html", "/register.html", "/weather.html")
-						.permitAll().requestMatchers("/css/**", "/favicon.ico").permitAll().anyRequest().authenticated()
+						.requestMatchers("/", "/index.html", "/login.html", "/register.html").permitAll()
+						.requestMatchers("/css/**", "/favicon.ico").permitAll().anyRequest().authenticated()
 
 				);
 
@@ -68,6 +69,7 @@ public class SecurityConfig {
 
 		return RestClient.builder().requestFactory(clientRequestFactory).baseUrl("http://api.openweathermap.org")
 				.build();
+
 	}
 
 	@Bean
@@ -75,8 +77,4 @@ public class SecurityConfig {
 		return Caffeine.newBuilder().maximumSize(200).expireAfterWrite(10, TimeUnit.MINUTES).build();
 	}
 
-	@Bean
-	ObjectMapper objectMapper() {
-		return new ObjectMapper();
-	}
 }

@@ -9,14 +9,13 @@ import com.mercia.weather.entities.User;
 import com.mercia.weather.exception.UserNotFoundException;
 import com.mercia.weather.repository.UserRepository;
 
+import lombok.AllArgsConstructor;
+
 @Service
+@AllArgsConstructor
 public class CustomUserService implements UserDetailsService {
 
 	private final UserRepository userRepository;
-
-	CustomUserService(UserRepository userRepository) {
-		this.userRepository = userRepository;
-	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
