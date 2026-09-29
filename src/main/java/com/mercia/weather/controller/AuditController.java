@@ -13,11 +13,13 @@ import com.mercia.weather.entities.ChangeAudit;
 import com.mercia.weather.repository.AccessAuditRepository;
 import com.mercia.weather.repository.ChangeAuditRepository;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/audit")
 @Tag(name="Audits of the application")
+@SecurityRequirement(name = "cookieAuth")
 public class AuditController {
 
 	private final ChangeAuditRepository changeAuditRepo;
@@ -28,13 +30,16 @@ public class AuditController {
 		this.changeAuditRepo = changeAuditRepo;
 	}
 
+	
 	@GetMapping("/access")
 	public ResponseEntity<List<AccessAudit>> getAccessAudits() {
-		return ResponseEntity.ok(accessAuditRepo.findAll());
+		List<AccessAudit> allAccessAudits = accessAuditRepo.findAll();
+		return ResponseEntity.ok(allAccessAudits);
 	}
 
 	@GetMapping("/changing")
 	public ResponseEntity<List<ChangeAudit>> getChangeAudits() {
-		return ResponseEntity.ok(changeAuditRepo.findAll());
+		List<ChangeAudit> allChangingAudits = changeAuditRepo.findAll();
+		return ResponseEntity.ok(allChangingAudits);
 	}
 }

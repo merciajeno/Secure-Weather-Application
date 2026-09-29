@@ -1,5 +1,8 @@
 package com.mercia.weather.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -13,10 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.mercia.weather.config.ApplicationConfig;
+import com.mercia.weather.entities.City;
 import com.mercia.weather.filter.AccessAuditFilter;
 import com.mercia.weather.service.CityService;
 import com.mercia.weather.service.JwtService;
@@ -33,7 +38,7 @@ class CityControllerTest {
 
 	@MockitoBean
 	private JwtService jwtService;
-	
+
 	@MockitoBean
 	private AccessAuditFilter accessAuditFilter;
 
@@ -47,6 +52,7 @@ class CityControllerTest {
 	@Test
 	void addCity_whenAdmin_shouldBeAccepted() throws Exception {
 
+		when(cityService.addCity(any(City.class))).thenReturn(ResponseEntity.ok("City added"));
 		mockMvc.perform(post("/city").with(user("admin").roles("ADMIN")).with(csrf())
 				.contentType(MediaType.APPLICATION_JSON).content("""
 
@@ -56,6 +62,7 @@ class CityControllerTest {
 						  "country": "US"
 						}
 						                        """)).andExpect(status().isOk());
+
 	}
 
 	// user role should be rejected here
@@ -86,6 +93,7 @@ class CityControllerTest {
 
 	@Test
 	void updateCity_whenAdmin_shouldBeAccepted() throws Exception {
+		when(cityService.updateCity(any(City.class), eq(5L))).thenReturn(ResponseEntity.ok("City updated"));
 		mockMvc.perform(put("/city/5").with(user("admin").roles("ADMIN")).with(csrf())
 				.contentType(MediaType.APPLICATION_JSON).content("""
 						{
@@ -103,7 +111,9 @@ class CityControllerTest {
 
 	@Test
 	void deleteCity_whenUser_shouldBeAccepted() throws Exception {
-		mockMvc.perform(delete("/city/5").with(user("john").roles("USER")).with(csrf())).andExpect(status().isForbidden());
+		when(cityService.deleteCity(5L)).thenReturn(ResponseEntity.ok("City deleted"));
+		mockMvc.perform(delete("/city/5").with(user("john").roles("USER")).with(csrf()))
+				.andExpect(status().isForbidden());
 	}
 
 }

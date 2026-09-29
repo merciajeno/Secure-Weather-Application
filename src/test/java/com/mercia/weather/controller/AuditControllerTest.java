@@ -47,11 +47,12 @@ public class AuditControllerTest {
 
 	@Test
 	@WithMockUser(username = "admin", roles = { "ADMIN" })
-
 	void getAccessAudit_ifAdmin_success() throws Exception {
+
 		List<AccessAudit> mockList = Arrays.asList(new AccessAudit());
 		when(accessAuditRepo.findAll()).thenReturn(mockList);
 		mockMvc.perform(get("/audit/access")).andExpect(status().isOk());
+
 	}
 
 	@Test
@@ -60,6 +61,7 @@ public class AuditControllerTest {
 		List<ChangeAudit> mockList = Arrays.asList(new ChangeAudit());
 		when(changeAuditRepo.findAll()).thenReturn(mockList);
 		mockMvc.perform(get("/audit/changing")).andExpect(status().isOk());
+
 	}
 
 	@Test

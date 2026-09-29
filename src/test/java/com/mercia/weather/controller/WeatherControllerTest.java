@@ -1,5 +1,7 @@
 package com.mercia.weather.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -14,6 +16,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.mercia.weather.config.ApplicationConfig;
+import com.mercia.weather.dto.WeatherResponseDto;
 import com.mercia.weather.filter.AccessAuditFilter;
 import com.mercia.weather.service.JwtService;
 import com.mercia.weather.service.WeatherService;
@@ -48,6 +51,7 @@ public class WeatherControllerTest {
 
 	@Test
 	void getInfo_whenAuthenticated_shouldBeAccepted() throws Exception {
+		when(weatherService.getWeatherDetails(any())).thenReturn(new WeatherResponseDto());
 		mockMvc.perform(get("/weather/getInfo").with(user("admin").roles("ADMIN")).with(csrf())
 				.contentType(MediaType.APPLICATION_JSON).content("""
 
@@ -57,5 +61,6 @@ public class WeatherControllerTest {
 						  "country": "US"
 						}
 						                        """)).andExpect(status().isOk());
+
 	}
 }
