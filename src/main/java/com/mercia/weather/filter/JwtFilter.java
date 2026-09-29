@@ -51,13 +51,18 @@ public class JwtFilter extends OncePerRequestFilter {
 //		// to remove Bearer word in the JWT
 //		String token =authHeader.substring(7);
 		String token = null;
-		for (Cookie cookie : request.getCookies()) {
-			if (cookie.getName().equals("token"))
-			{
-				token = cookie.getValue();
-				break;
+
+		Cookie[] cookies = request.getCookies();
+
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals("token")) {
+					token = cookie.getValue();
+					break;
+				}
 			}
 		}
+		log.info("Token:"+token);
 		if (token == null) {
 			filterChain.doFilter(request, response);
 			return;
@@ -71,7 +76,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
 		SecurityContext context = SecurityContextHolder.getContext();
 		context.setAuthentication(authentication);
-
 		filterChain.doFilter(request, response);
 	}
 

@@ -10,8 +10,11 @@ import com.mercia.weather.dto.WeatherRequestDto;
 import com.mercia.weather.dto.WeatherResponseDto;
 import com.mercia.weather.service.WeatherService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/weather")
+@Tag(name="weather information of the cities")
 public class WeatherController {
 
 	private final WeatherService weatherService;

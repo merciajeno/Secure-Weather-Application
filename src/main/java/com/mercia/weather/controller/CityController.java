@@ -15,8 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mercia.weather.entities.City;
 import com.mercia.weather.service.CityService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/city")
+@Tag(name="managing of the cities")
 public class CityController {
 
 	private final CityService cityService;

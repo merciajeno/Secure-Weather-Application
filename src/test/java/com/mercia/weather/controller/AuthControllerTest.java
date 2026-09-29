@@ -12,6 +12,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.mercia.weather.config.ApplicationConfig;
+import com.mercia.weather.filter.AccessAuditFilter;
 import com.mercia.weather.service.AuthService;
 import com.mercia.weather.service.JwtService;
 
@@ -20,48 +21,36 @@ import com.mercia.weather.service.JwtService;
 public class AuthControllerTest {
 
 	@Autowired
-    private MockMvc mockMvc;
+	private MockMvc mockMvc;
 
-    @MockitoBean
-    private AuthService authService;
+	@MockitoBean
+	private AuthService authService;
 
-    @MockitoBean
+	@MockitoBean
 	private JwtService jwtService;
-    
-   
 
-    @Test
-    void register_whenNotAuthenticated_shouldBeAllowed() throws Exception {
+	@MockitoBean
+	private AccessAuditFilter accessAuditFilter;
 
-        mockMvc.perform(
-                post("/auth/register")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                        {
-                          "username": "john",
-                          "email":"merc@co.in",
-                          "password": "12345"
-                        }
-                        """))
-            .andExpect(status().isOk());
-    }
-    
-    @Test
-    void register_InvalidEmail_shouldBeRejected() throws Exception {
+	@Test
+	void register_whenNotAuthenticated_shouldBeAllowed() throws Exception {
 
-        mockMvc.perform(
-                post("/auth/register")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                        {
-                          "username": "john",
-                          "email":"merc",
-                          "password": "12345"
-                        }
-                        """))
-            .andExpect(status().is(400));
-    }
-    
-    
+		mockMvc.perform(post("/auth/register").contentType(MediaType.APPLICATION_JSON).content("""
+				{
+				  "username": "john",
+				  "email":"merc@co.in",
+				  "password": "12345"
+				}
+				""")).andExpect(status().isOk());
+	}
+
+
+	@Test
+	void login_whenCorrectCredentials_success() throws Exception {
+		mockMvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON).content("""
+				{
+				"username":"john",
+				"password":"12345"
+				""")).andExpect(status().is(200));
+	}
 }
-

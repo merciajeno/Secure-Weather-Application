@@ -10,14 +10,15 @@ import com.mercia.weather.dto.LoginRequest;
 import com.mercia.weather.dto.RegisterRequest;
 import com.mercia.weather.service.AuthService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/auth")
 @Slf4j
+@Tag(name="User login and register")
 public class AuthController {
-
 	private final AuthService authService;
 
 	public AuthController(AuthService authService) {

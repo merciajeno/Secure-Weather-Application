@@ -27,20 +27,20 @@ public class ApplicationConfig {
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
-		http.csrf(csrf -> csrf.disable()).addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-
-				.authorizeHttpRequests(auth -> auth
-
-						.requestMatchers(HttpMethod.POST, "/city/**").hasRole("ADMIN")
+		http.csrf(csrf -> csrf.disable()).cors(cors -> cors.configure(http))
+				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+				.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.POST, "/city/**").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.DELETE, "/city/**").hasRole("ADMIN")
+						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**","/swagger-ui.html").permitAll()
 						.requestMatchers(HttpMethod.PUT, "/city/**").hasRole("ADMIN")
-						.requestMatchers("/auth/register", "/auth/login").permitAll().requestMatchers("/weather/**")
-						.hasAnyRole("ADMIN", "USER").requestMatchers("/audit/**").hasRole("ADMIN")
+						.requestMatchers("/auth/register", "/auth/login", "/auth/me").permitAll()
+						.requestMatchers("/weather/**").hasAnyRole("ADMIN", "USER").requestMatchers("/audit/**")
+						.hasRole("ADMIN")
 
 						// frontend stuffs
 						.requestMatchers("/", "/index.html", "/login.html", "/register.html").permitAll()
-						.requestMatchers("/admin.html").hasRole("ADMIN")
-						.requestMatchers("/css/**", "/favicon.ico").permitAll().anyRequest().authenticated()
+						.requestMatchers("/admin.html").hasRole("ADMIN").requestMatchers("/css/**", "/favicon.ico")
+						.permitAll().anyRequest().authenticated()
 
 				);
 

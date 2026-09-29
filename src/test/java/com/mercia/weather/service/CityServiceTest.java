@@ -3,7 +3,6 @@ package com.mercia.weather.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,20 +18,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.mercia.weather.entities.AccessAudit;
 import com.mercia.weather.entities.ChangeAudit;
 import com.mercia.weather.entities.City;
-import com.mercia.weather.entities.User;
 import com.mercia.weather.exception.ResourceAlreadyExists;
 import com.mercia.weather.exception.ResourceNotFoundException;
 import com.mercia.weather.repository.AccessAuditRepository;
 import com.mercia.weather.repository.ChangeAuditRepository;
 import com.mercia.weather.repository.CityRepository;
-import com.mercia.weather.repository.UserRepository;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -47,9 +41,6 @@ class CityServiceTest {
 
 	@Mock
 	private AccessAuditRepository accessAuditRepo;
-
-	@Mock
-	private UserRepository userRepo;
 
 	@Mock
 	private ObjectMapper objectMapper;
@@ -100,28 +91,12 @@ class CityServiceTest {
 	void addCity_ifConfigured_Failed() {
 
 		City city = new City("Bengaluru", "Karnataka", "IN");
-
-		Authentication authentication = mock(Authentication.class);
-		SecurityContext context = mock(SecurityContext.class);
-
-		User user = new User();
-		user.setId(1L);
-		user.setUsername("admin");
-		user.setEmail("merc@co.in");
-
-		when(context.getAuthentication()).thenReturn(authentication);
-		when(authentication.getName()).thenReturn("admin");
-
-		SecurityContextHolder.setContext(context);
-
-		when(userRepo.findByUsername("admin")).thenReturn(Optional.of(user));
-
 		when(cityRepo.findByNameStateCountry("Bengaluru", "Karnataka", "IN")).thenReturn(Optional.of(city));
 
 		assertThrows(ResourceAlreadyExists.class, () -> {
 			cityService.addCity(city);
 		});
-		verify(accessAuditRepo).save(any(AccessAudit.class));
+
 	}
 
 	@Test
@@ -129,27 +104,11 @@ class CityServiceTest {
 
 		City city = new City("Bengaluru", "Karnataka", "IN");
 
-		Authentication authentication = mock(Authentication.class);
-		SecurityContext context = mock(SecurityContext.class);
-
-		User user = new User();
-		user.setId(1L);
-		user.setUsername("admin");
-		user.setEmail("merc@co.in");
-
-		when(context.getAuthentication()).thenReturn(authentication);
-		when(authentication.getName()).thenReturn("admin");
-
-		SecurityContextHolder.setContext(context);
-
-		when(userRepo.findByUsername("admin")).thenReturn(Optional.of(user));
-
 		when(cityRepo.findByNameStateCountry("Bengaluru", "Karnataka", "IN")).thenReturn(Optional.empty());
-
 		ResponseEntity<String> response = cityService.addCity(city);
 
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
-		verify(accessAuditRepo).save(any(AccessAudit.class));
+
 	}
 
 	@Test
@@ -168,7 +127,6 @@ class CityServiceTest {
 	void updateCity_whenNotExist_failed() {
 		City city = new City("Bengaluru", "Karnataka", "IN");
 		when(cityRepo.findById(2L)).thenReturn(Optional.empty());
-
 		ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
 			cityService.updateCity(city, 2L);
 		});

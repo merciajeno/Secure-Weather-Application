@@ -1,3 +1,4 @@
+
 package com.mercia.weather.controller;
 
 import java.util.List;
@@ -12,8 +13,11 @@ import com.mercia.weather.entities.ChangeAudit;
 import com.mercia.weather.repository.AccessAuditRepository;
 import com.mercia.weather.repository.ChangeAuditRepository;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/audit")
+@Tag(name="Audits of the application")
 public class AuditController {
 
 	private final ChangeAuditRepository changeAuditRepo;

@@ -14,6 +14,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.mercia.weather.config.ApplicationConfig;
+import com.mercia.weather.filter.AccessAuditFilter;
 import com.mercia.weather.service.JwtService;
 import com.mercia.weather.service.WeatherService;
 
@@ -29,6 +30,9 @@ public class WeatherControllerTest {
 
 	@MockitoBean
 	private JwtService jwtService;
+
+	@MockitoBean
+	private AccessAuditFilter accessAuditFilter;
 
 	@Test
 	void getInfo_whenNotAuthenticated_shouldReturnUnauthorized() throws Exception {

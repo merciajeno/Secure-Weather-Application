@@ -6,24 +6,16 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.mercia.weather.entities.AccessAudit;
 import com.mercia.weather.entities.Action;
 import com.mercia.weather.entities.ChangeAudit;
 import com.mercia.weather.entities.City;
 import com.mercia.weather.entities.ResourceType;
-import com.mercia.weather.entities.Status;
-import com.mercia.weather.entities.User;
 import com.mercia.weather.exception.ResourceAlreadyExists;
 import com.mercia.weather.exception.ResourceNotFoundException;
-import com.mercia.weather.repository.AccessAuditRepository;
 import com.mercia.weather.repository.ChangeAuditRepository;
 import com.mercia.weather.repository.CityRepository;
-import com.mercia.weather.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -38,11 +30,7 @@ public class CityService {
 
 	private final ChangeAuditRepository changeAuditRepo;
 
-	private final AccessAuditRepository accessAuditRepo;
-
 	private final ObjectMapper objectMapper;
-
-	private final UserRepository userRepo;
 
 	@Transactional(dontRollbackOn = ResourceAlreadyExists.class)
 	public ResponseEntity<String> addCity(City city) {
@@ -52,31 +40,16 @@ public class CityService {
 		System.out.println(cityName);
 		System.out.println(state);
 		System.out.println(country);
-		AccessAudit entity = new AccessAudit();
-		SecurityContext context = SecurityContextHolder.getContext();
-		Authentication authentication = context.getAuthentication();
-		User user = userRepo.findByUsername(authentication.getName()).get();
-		entity.setEndpoint("/city");
-		entity.setTimeStamp(LocalDateTime.now());
-		entity.setUserEmail(user.getEmail());
-		entity.setUserId(user.getId());
-		entity.setUserName(user.getUsername());
 
 		Optional<City> byNameStateCountry = cityRepo.findByNameStateCountry(cityName, state, country);
 		if (byNameStateCountry.isPresent()) {
 
-			entity.setActionDetails("Trying to add configured city");
-			entity.setStatus(Status.FAILED);
-			accessAuditRepo.save(entity);
 			log.warn("You are adding a city that is already configured");
 			throw new ResourceAlreadyExists("City is already present");
 		}
 
 		cityRepo.save(city);
 
-		entity.setActionDetails(String.format("City: %s,%s,%s is added", cityName, state, country));
-		entity.setStatus(Status.SUCCESS);
-		accessAuditRepo.save(entity);
 		return ResponseEntity.status(201).body("City is saved");
 	}
 

@@ -13,12 +13,9 @@ import org.springframework.stereotype.Service;
 
 import com.mercia.weather.dto.LoginRequest;
 import com.mercia.weather.dto.RegisterRequest;
-import com.mercia.weather.entities.AccessAudit;
 import com.mercia.weather.entities.Role;
-import com.mercia.weather.entities.Status;
 import com.mercia.weather.entities.User;
 import com.mercia.weather.exception.UserNotFoundException;
-import com.mercia.weather.repository.AccessAuditRepository;
 import com.mercia.weather.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -33,8 +30,7 @@ public class AuthService {
 	private final UserRepository userRepo;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
-	private final AccessAuditRepository accessAuditRepo;
-
+	
 	@Transactional
 	public ResponseEntity<String> register(RegisterRequest request) {
 		Optional<User> byEmail = userRepo.findByEmail(request.getEmail());
@@ -45,12 +41,9 @@ public class AuthService {
 		User user = new User(request.getUsername(), request.getEmail(), passwordEncoder.encode(request.getPassword()),
 				Role.USER, LocalDateTime.now());
 		log.debug("User registered:" + user);
-		User savedUser = userRepo.save(user);
+		userRepo.save(user);
 
-		AccessAudit entity = new AccessAudit(savedUser.getId(), request.getUsername(), request.getEmail(),
-				"/auth/register", Status.SUCCESS, LocalDateTime.now());
-		entity.setActionDetails("Registered ");
-		accessAuditRepo.save(entity);
+		
 		return ResponseEntity.ok().body("User Registered successfully");
 	}
 
@@ -67,22 +60,11 @@ public class AuthService {
 
 		if (!passwordMatch) {
 
-			AccessAudit audit = new AccessAudit(existingUser.getId(), username, existingUser.getEmail(), "/auth/login",
-					Status.FAILED, LocalDateTime.now());
-
-			audit.setActionDetails("Login failed: invalid password");
-			accessAuditRepo.save(audit);
-
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
 		}
 
 		String token = jwtService.generateToken(username);
 		log.info("Token is generated");
-		AccessAudit audit = new AccessAudit(existingUser.getId(), username, existingUser.getEmail(), "/auth/login",
-				Status.SUCCESS, LocalDateTime.now());
-
-		audit.setActionDetails("User logged in successfully");
-		accessAuditRepo.save(audit);
 
 		ResponseCookie cookie = ResponseCookie.from("token", token).httpOnly(true).secure(false) // true when using
 																									// HTTPS
