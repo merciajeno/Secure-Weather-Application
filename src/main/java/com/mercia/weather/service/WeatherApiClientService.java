@@ -12,6 +12,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class WeatherApiClientService {
 
+	private static final String DATA_2_5_WEATHER = "/data/2.5/weather";
+
 	private String apiKey;
 
 	private final RestClient restClient;
@@ -19,7 +21,7 @@ public class WeatherApiClientService {
 	public WeatherResponseDto getWeatherDetailsFromApi(String query) {
 
 		OpenWeatherResponse openWeatherResponse = restClient.get()
-				.uri(uriBuilder -> uriBuilder.path("/data/2.5/weather").queryParam("q", query)
+				.uri(uriBuilder -> uriBuilder.path(DATA_2_5_WEATHER).queryParam("q", query)
 						.queryParam("units", "metric").queryParam("appid", apiKey).build())
 				.retrieve().body(OpenWeatherResponse.class);
 

@@ -45,9 +45,8 @@ public class CityService {
 			log.warn("You are adding a city that is already configured");
 			throw new ResourceAlreadyExists("City is already present");
 		}
-
 		cityRepo.save(city);
-
+		log.info("City is added");
 		return ResponseEntity.status(201).body("City is saved");
 	}
 
@@ -74,6 +73,7 @@ public class CityService {
 		entity.setResourceType(ResourceType.CITY);
 		entity.setUpdatedAt(LocalDateTime.now());
 		changeAuditRepo.save(entity);
+		log.info("city is updated");
 		return ResponseEntity.status(201).build();
 	}
 
@@ -81,7 +81,6 @@ public class CityService {
 	public ResponseEntity<String> deleteCity(Long id) {
 		City existingCity = cityRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("City with id:" + id + " is not found"));
-
 		cityRepo.delete(existingCity);
 		ChangeAudit change = new ChangeAudit();
 		change.setAction(Action.CITY_DELETED);

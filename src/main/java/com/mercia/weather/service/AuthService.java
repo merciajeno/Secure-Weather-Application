@@ -56,7 +56,7 @@ public class AuthService {
 		boolean passwordMatch = passwordEncoder.matches(password, existingUser.getPassword());
 
 		if (!passwordMatch) {
-
+            log.warn("Invalid password. Please try again");
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
 		}
 
@@ -65,6 +65,7 @@ public class AuthService {
 		ResponseCookie cookie = ResponseCookie.from("token", token).httpOnly(true).secure(false) // true when using
 																									// HTTPS
 				.path("/").sameSite("Strict").maxAge(Duration.ofMinutes(15)).build();
+		log.info("Login is successful ");
 		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body("Login successful");
 	}
 

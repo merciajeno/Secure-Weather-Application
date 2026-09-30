@@ -38,7 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 
-		log.info("Incoming request: " + request.getMethod() + " " + request.getRequestURI());
+		log.debug("Incoming request: " + request.getMethod() + " " + request.getRequestURI());
 		String token = null;
 		Cookie[] cookies = request.getCookies();
 
@@ -50,7 +50,7 @@ public class JwtFilter extends OncePerRequestFilter {
 				}
 			}
 		}
-		log.info("Token:" + token);
+		log.debug("Token:" + token);
 		if (token == null) {
 			filterChain.doFilter(request, response);
 			return;

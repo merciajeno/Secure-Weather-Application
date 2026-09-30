@@ -118,12 +118,11 @@ class WeatherServiceTest {
 		when(weatherApiClientService.getWeatherDetailsFromApi(query)).thenReturn(response);
 
 		assertEquals(weatherService.getWeatherDetails(request), response);
-	
+
 	}
 
 	@Test
-	void shouldFail_fromExternalApi_ifWrongCityChoosen()
-	{
+	void shouldFail_fromExternalApi_ifWrongCityChoosen() {
 		WeatherRequestDto request = new WeatherRequestDto();
 		String city = "Bengaluru";
 		request.setCity(city);
@@ -131,14 +130,15 @@ class WeatherServiceTest {
 		request.setState(state);
 		String country = "IN";
 		request.setCountry(country);
-		City existingCity = new City(city,state,country);
+		City existingCity = new City(city, state, country);
 		String query = String.format("%s, %s, %s", city, state, country);
 		when(cityRepo.findByNameStateCountry(city, state, country)).thenReturn(Optional.of(existingCity));
 		when(cacheService.getWeatherDetailsIfPresent(request)).thenReturn(null);
 		when(weatherApiClientService.getWeatherDetailsFromApi(query)).thenThrow(UnavailableCity.class);
-		
-		assertThrows(UnavailableCity.class, ()->{
+
+		assertThrows(UnavailableCity.class, () -> {
 			weatherService.getWeatherDetails(request);
 		});
 	}
+
 }

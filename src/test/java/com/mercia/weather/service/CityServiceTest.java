@@ -19,6 +19,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.client.ResourceAccessException;
 
 import com.mercia.weather.entities.ChangeAudit;
 import com.mercia.weather.entities.City;
@@ -88,6 +89,14 @@ class CityServiceTest {
 	}
 
 	@Test
+	void getCities_ServiceDown_Failed() {
+		when(cityRepo.findAll()).thenThrow(new ResourceAccessException(null));
+		assertThrows(ResourceAccessException.class, () -> {
+			cityService.getAllCities();
+		});
+	}
+
+	@Test
 	void addCity_ifConfigured_Failed() {
 
 		City city = new City("Bengaluru", "Karnataka", "IN");
@@ -150,7 +159,6 @@ class CityServiceTest {
 		ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
 			cityService.deleteCity(1L);
 		});
-
 		assertEquals("City with id:1 is not found", exception.getMessage());
 	}
 }

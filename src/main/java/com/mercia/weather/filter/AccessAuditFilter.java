@@ -31,7 +31,8 @@ public class AccessAuditFilter extends OncePerRequestFilter {
 
 	public boolean publicApis(String requestURI) {
 		return requestURI.contains("/api/v3/docs") || requestURI.contains("/swagger") || requestURI.contains("api-docs")
-				|| requestURI.contains("/favicon.ico") || requestURI.contains("/.well-known");
+				|| requestURI.contains("/favicon.ico") || requestURI.contains("/.well-known")
+				|| requestURI.contains("html");
 	}
 
 	@Override
@@ -43,32 +44,33 @@ public class AccessAuditFilter extends OncePerRequestFilter {
 
 		} finally {
 			String requestURI = request.getRequestURI();
-			log.info(requestURI);
+			log.debug(requestURI);
 			// Don't audit these endpoints
 			if (publicApis(requestURI)) {
-				log.info("Is open endpoint");
+				log.debug("Is open endpoint");
 				return;
 			}
 
 			AccessAudit audit = new AccessAudit();
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			if (authentication != null && authentication.isAuthenticated()) {
-				userRepo.findByUsername(authentication.getName()).ifPresent(user -> {
+				String name = authentication.getName();
+				log.debug(name);
+				userRepo.findByUsername(name).ifPresent(user -> {
 					audit.setUserId(user.getId());
 					audit.setUserName(user.getUsername());
 					audit.setUserEmail(user.getEmail());
 				});
 			}
-
 			audit.setEndpoint(requestURI);
 			audit.setTimeStamp(LocalDateTime.now());
-
-			if (response.getStatus() >= 200 && response.getStatus() < 400) {
+			int status = response.getStatus();
+			log.debug(String.format("Status is:%d", status));
+			if (status >= 200 && status < 400) {
 				audit.setStatus(Status.SUCCESS);
 			} else {
 				audit.setStatus(Status.FAILED);
 			}
-
 			accessAuditRepository.save(audit);
 		}
 	}
