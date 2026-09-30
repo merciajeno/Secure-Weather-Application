@@ -24,15 +24,10 @@ public class WeatherApiClientService {
 				.retrieve().body(OpenWeatherResponse.class);
 
 		WeatherResponseDto weatherResponseDto = new WeatherResponseDto();
-
 		weatherResponseDto.setTemperature(openWeatherResponse.getMain().getTemp());
-
 		weatherResponseDto.setPressure(openWeatherResponse.getMain().getPressure());
-
 		weatherResponseDto.setHumidity(openWeatherResponse.getMain().getHumidity());
-
 		weatherResponseDto.setWindSpeed(openWeatherResponse.getWind().getSpeed());
-
 		return weatherResponseDto;
 	}
 }

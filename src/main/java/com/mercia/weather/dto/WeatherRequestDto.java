@@ -9,13 +9,16 @@ import lombok.Setter;
 @Setter
 public class WeatherRequestDto {
 
-	@NotBlank @NotNull
+	@NotBlank
+	@NotNull
 	private String city;
-	
-	@NotBlank @NotNull
+
+	@NotBlank
+	@NotNull
 	private String state;
-	
-	@NotBlank @NotNull
+
+	@NotBlank
+	@NotNull
 	private String country;
-	
+
 }

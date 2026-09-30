@@ -21,12 +21,11 @@ public class PropertyBeanConfig {
 		return apiKey;
 	}
 
-	@Value("${secret.key}") 
+	@Value("${secret.key}")
 	private String secret;
-	
+
 	@Bean
-	SecretKey secretKey(String secret)
-	{
+	SecretKey secretKey(String secret) {
 		return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 	}
 }

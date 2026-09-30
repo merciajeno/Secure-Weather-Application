@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/weather")
-@Tag(name="weather information of the cities")
+@Tag(name = "weather information of the cities")
 @SecurityRequirement(name = "cookieAuth")
 public class WeatherController {
 

@@ -42,9 +42,7 @@ public class AccessAuditFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 
 		} finally {
-
 			String requestURI = request.getRequestURI();
-
 			log.info(requestURI);
 			// Don't audit these endpoints
 			if (publicApis(requestURI)) {
@@ -53,9 +51,7 @@ public class AccessAuditFilter extends OncePerRequestFilter {
 			}
 
 			AccessAudit audit = new AccessAudit();
-
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
 			if (authentication != null && authentication.isAuthenticated()) {
 				userRepo.findByUsername(authentication.getName()).ifPresent(user -> {
 					audit.setUserId(user.getId());

@@ -14,15 +14,15 @@ import lombok.Setter;
 @AllArgsConstructor
 public class RegisterRequest {
 
-	@NotBlank @NotNull
+	@NotBlank
+	@NotNull
 	private String username;
-	
-	@Email(
-		    regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",// email pattern matching
-		    message = "Email format must be like user@example.com"
-		)
+
+	@Email(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", // email pattern matching
+			message = "Email format must be like user@example.com")
 	private String email;
-	
-	@NotBlank @NotNull
+
+	@NotBlank
+	@NotNull
 	private String password;
 }

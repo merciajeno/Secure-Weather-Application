@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/audit")
-@Tag(name="Audits of the application")
+@Tag(name = "Audits of the application")
 @SecurityRequirement(name = "cookieAuth")
 public class AuditController {
 
@@ -30,7 +30,6 @@ public class AuditController {
 		this.changeAuditRepo = changeAuditRepo;
 	}
 
-	
 	@GetMapping("/access")
 	public ResponseEntity<List<AccessAudit>> getAccessAudits() {
 		List<AccessAudit> allAccessAudits = accessAuditRepo.findAll();

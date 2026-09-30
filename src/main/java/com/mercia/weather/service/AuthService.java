@@ -30,7 +30,7 @@ public class AuthService {
 	private final UserRepository userRepo;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
-	
+
 	@Transactional
 	public ResponseEntity<String> register(RegisterRequest request) {
 		Optional<User> byEmail = userRepo.findByEmail(request.getEmail());
@@ -43,7 +43,6 @@ public class AuthService {
 		log.debug("User registered:" + user);
 		userRepo.save(user);
 
-		
 		return ResponseEntity.ok().body("User Registered successfully");
 	}
 
@@ -52,10 +51,8 @@ public class AuthService {
 
 		String username = request.getUsername();
 		String password = request.getPassword();
-
 		User existingUser = userRepo.findByUsername(username)
 				.orElseThrow(() -> new UserNotFoundException("User not found"));
-
 		boolean passwordMatch = passwordEncoder.matches(password, existingUser.getPassword());
 
 		if (!passwordMatch) {
@@ -65,11 +62,9 @@ public class AuthService {
 
 		String token = jwtService.generateToken(username);
 		log.info("Token is generated");
-
 		ResponseCookie cookie = ResponseCookie.from("token", token).httpOnly(true).secure(false) // true when using
 																									// HTTPS
 				.path("/").sameSite("Strict").maxAge(Duration.ofMinutes(15)).build();
-
 		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body("Login successful");
 	}
 

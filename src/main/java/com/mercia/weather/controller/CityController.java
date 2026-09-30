@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/city")
-@Tag(name="managing of the cities")
+@Tag(name = "managing of the cities")
 @SecurityRequirement(name = "cookieAuth")
 public class CityController {
 

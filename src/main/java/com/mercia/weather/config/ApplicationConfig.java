@@ -31,7 +31,7 @@ public class ApplicationConfig {
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 				.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.POST, "/city/**").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.DELETE, "/city/**").hasRole("ADMIN")
-						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**","/swagger-ui.html").permitAll()
+						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
 						.requestMatchers(HttpMethod.PUT, "/city/**").hasRole("ADMIN")
 						.requestMatchers("/auth/register", "/auth/login", "/auth/me").permitAll()
 						.requestMatchers("/weather/**").hasAnyRole("ADMIN", "USER").requestMatchers("/audit/**")

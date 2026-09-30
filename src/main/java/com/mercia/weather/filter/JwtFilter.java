@@ -37,21 +37,9 @@ public class JwtFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 
-		// String authHeader = request.getHeader("Authorization");
 		log.info("Incoming request: " + request.getMethod() + " " + request.getRequestURI());
-
-//		if(authHeader==null || !authHeader.startsWith("Bearer"))
-//		{
-//			filterChain.doFilter(request, response);
-//			return;
-//		}
-//		
-//		// to remove Bearer word in the JWT
-//		String token =authHeader.substring(7);
 		String token = null;
-
 		Cookie[] cookies = request.getCookies();
 
 		if (cookies != null) {
@@ -62,18 +50,15 @@ public class JwtFilter extends OncePerRequestFilter {
 				}
 			}
 		}
-		log.info("Token:"+token);
+		log.info("Token:" + token);
 		if (token == null) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 		String username = jwtService.extractUsername(token);
-
 		UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
 		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
 				userDetails.getAuthorities());
-
 		SecurityContext context = SecurityContextHolder.getContext();
 		context.setAuthentication(authentication);
 		filterChain.doFilter(request, response);

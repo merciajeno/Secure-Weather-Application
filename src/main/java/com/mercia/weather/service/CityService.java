@@ -27,9 +27,7 @@ import tools.jackson.databind.ObjectMapper;
 @AllArgsConstructor
 public class CityService {
 	private final CityRepository cityRepo;
-
 	private final ChangeAuditRepository changeAuditRepo;
-
 	private final ObjectMapper objectMapper;
 
 	@Transactional(dontRollbackOn = ResourceAlreadyExists.class)
@@ -64,9 +62,7 @@ public class CityService {
 		String country = city.getCountry();
 
 		existingCity.setCityName(cityName);
-
 		existingCity.setState(state);
-
 		existingCity.setCountry(country);
 		existingCity.setCreatedAt(LocalDateTime.now());
 		city.setId(existingCity.getId());
