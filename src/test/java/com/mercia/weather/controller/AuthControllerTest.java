@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +17,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.mercia.weather.config.ApplicationConfig;
+import com.mercia.weather.exception.UserNotFoundException;
 import com.mercia.weather.filter.AccessAuditFilter;
 import com.mercia.weather.service.AuthService;
 import com.mercia.weather.service.JwtService;
 
-@WebMvcTest(AuthController.class)
+@WebMvcTest(controllers = AuthController.class, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = AccessAuditFilter.class))
 @Import(ApplicationConfig.class)
 public class AuthControllerTest {
 
@@ -31,9 +34,6 @@ public class AuthControllerTest {
 
 	@MockitoBean
 	private JwtService jwtService;
-
-	@MockitoBean
-	private AccessAuditFilter accessAuditFilter;
 
 	@Test
 	void register_whenNotAuthenticated_shouldBeAllowed() throws Exception {
@@ -47,6 +47,8 @@ public class AuthControllerTest {
 				}
 				""")).andExpect(status().isOk());
 	}
+	
+	
 
 	@Test
 	void login_whenCorrectCredentials_success() throws Exception {
@@ -60,4 +62,14 @@ public class AuthControllerTest {
 				""")).andExpect(status().isOk());
 	}
 
+	@Test
+	void login_whenNotRegistered_failed() throws Exception {
+		when(authService.login(any())).thenThrow(new UserNotFoundException("User not found"));
+		mockMvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON).content("""
+				{
+				    "username": "john",
+				    "password": "12345"
+				}
+				""")).andExpect(status().isNotFound());
+	}
 }

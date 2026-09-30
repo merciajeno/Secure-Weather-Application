@@ -10,6 +10,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -24,7 +26,7 @@ import com.mercia.weather.repository.ChangeAuditRepository;
 import com.mercia.weather.repository.UserRepository;
 import com.mercia.weather.service.JwtService;
 
-@WebMvcTest(AuditController.class)
+@WebMvcTest(controllers = AuditController.class, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = AccessAuditFilter.class))
 @Import(ApplicationConfig.class)
 public class AuditControllerTest {
 
@@ -41,9 +43,6 @@ public class AuditControllerTest {
 
 	@MockitoBean
 	private UserRepository userRepo;
-
-	@MockitoBean
-	private AccessAuditFilter accessAuditFilter;
 
 	@Test
 	@WithMockUser(username = "admin", roles = { "ADMIN" })
