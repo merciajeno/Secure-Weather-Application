@@ -29,7 +29,6 @@ public class WeatherService {
 		String state = weatherRequestDto.getState();
 		String country = weatherRequestDto.getCountry();
 		log.info(String.format("Requested:%s ,%s, %s", city, state, country));
-
 		Optional<City> byNameStateCountry = cityRepo.findByNameStateCountry(city, state, country);
 		if (byNameStateCountry.isEmpty()) {
 
